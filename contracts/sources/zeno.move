@@ -27,6 +27,7 @@ const E_INVALID_FINAL_COIN_AMOUNT: u64 = 9;
 const E_INVALID_FINAL_COIN_TYPE: u64 = 10;
 const E_INVALID_CLAIMER: u64 = 11;
 const E_MARKET_DELIVERY_TIME_NOT_PAST: u64 = 12;
+const E_SETTLEMENT_TIME_PAST: u64 = 13;
 // --- TYPES ---
 
 public struct Order<phantom T> has key, store {
@@ -103,6 +104,7 @@ public struct OrderOwnerTable has key, store {
 #[allow(unused_field)]
 public struct Resolution has copy, drop, store {
     resolved_at: u64,
+    settlement_start: u64,
     delivery_before: u64,
     coin_type: TypeName,
     /// decimal adjustment difference between the collateral and the coin in mist (9 decimals)
@@ -335,10 +337,10 @@ public fun create_order<T>(
     // check market is not paused
     assert!(!market.is_paused, E_MARKET_PAUSED);
 
-    // check if market is already past delivery time
     if (market.resolution.is_some()) {
         let resolution = market.resolution.borrow();
-        assert!(clock.timestamp_ms() >= resolution.delivery_before, E_MARKET_DELIVERY_TIME_PAST);
+        // check if settlement start time is past
+        assert!(clock.timestamp_ms() <= resolution.settlement_start, E_SETTLEMENT_TIME_PAST);
     };
 
     // check collateral type
