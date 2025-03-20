@@ -91,7 +91,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          "font-body min-h-screen antialiased",
+          "bg-background font-body min-h-screen antialiased",
           body.variable,
           heading.variable
         )}
@@ -104,7 +104,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <WalletProvider>
             <SidebarProvider>
               <AppSidebar />
-              <main className="container">
+              <main className="container flex min-h-screen flex-col">
                 <AppNavbar />
                 {children}
               </main>

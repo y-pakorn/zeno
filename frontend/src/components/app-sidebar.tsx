@@ -31,7 +31,8 @@ const items = [
       {
         label: "Home",
         icon: Home,
-        href: "/",
+        href: "/home",
+        disabled: true,
       },
     ],
   },
@@ -41,9 +42,9 @@ const items = [
       {
         label: "Pre-Market",
         icon: KanbanSquare,
-        href: "/pre-market",
+        href: "/",
         className: "-rotate-90",
-        matchFn: (pathname) => pathname.startsWith("/pre-market"),
+        // matchFn: (pathname) => pathname.startsWith("/pre-market"),
       },
     ],
   },
@@ -54,6 +55,7 @@ const items = [
         label: "Portfolio",
         icon: PieChart,
         href: "/portfolio",
+        disabled: true,
       },
     ],
   },
@@ -65,6 +67,7 @@ const items = [
     href: string
     className?: string
     matchFn?: (pathname: string) => boolean
+    disabled?: boolean
   }[]
 }[]
 
@@ -84,9 +87,14 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {item.items.map((item) => (
-                  <Link href={item.href} key={item.href}>
+                  <Link
+                    href={item.href}
+                    key={item.href}
+                    className={cn(item.disabled && "pointer-events-none")}
+                  >
                     <SidebarMenuItem>
                       <SidebarMenuButton
+                        disabled={item.disabled}
                         isActive={
                           item.matchFn
                             ? item.matchFn(pathname)
