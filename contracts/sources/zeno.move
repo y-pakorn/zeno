@@ -3,7 +3,7 @@ module zeno::zeno;
 use std::string::String;
 use std::type_name::{Self, TypeName};
 use sui::bag::{Self, Bag};
-use sui::balance::{Self, Balance};
+use sui::balance::Balance;
 use sui::clock::Clock;
 use sui::coin::Coin;
 use sui::event;
@@ -16,7 +16,7 @@ const MIST: u64 = 1_000_000_000;
 
 const E_INVALID_COLLATERAL_TYPE: u64 = 0;
 const E_INSUFFICIENT_COLLATERAL: u64 = 1;
-const E_INVALID_MINIMUM_FILL_AMOUNT: u64 = 2;
+const E_AMOUNT_LEFT_NOT_ENOUGH: u64 = 2;
 const E_MARKET_PAUSED: u64 = 3;
 const E_MARKET_DELIVERY_TIME_PAST: u64 = 4;
 const E_INVALID_ORDER_OWNER: u64 = 5;
@@ -43,7 +43,7 @@ public struct Order<phantom T> has key, store {
     /// 100_000_000 = 0.1 collateral per 1 final coin
     rate: u64,
     created_at: u64,
-    minimum_fill_amount: Option<u64>, // if set, the order will can be partially filled
+    can_partially_fill: bool, // if set, the order will can be partially filled
     by: address,
 }
 
@@ -139,7 +139,7 @@ public struct OrderCreated has copy, drop, store {
     is_buy: bool,
     can_partially_fill: bool,
     rate: u64,
-    amount: u64,
+    collateral_amount: u64,
     collateral_type: TypeName,
 }
 
@@ -148,8 +148,8 @@ public struct OrderFilled has copy, drop, store {
     order_id: ID,
     filled_order_id: ID,
     rate: u64,
-    amount: u64,
-    amount_left: u64,
+    maker_collateral_amount_left: u64,
+    collateral_amount: u64,
     collateral_type: TypeName,
 }
 
@@ -201,8 +201,8 @@ public fun create_premarket(
     cancel_fee_rate_bps: u64,
     penalty_fee_rate_bps: u64,
     fee_addr: address,
-    ctx: &mut TxContext,
     clock: &Clock,
+    ctx: &mut TxContext,
 ) {
     let premarket = PreMarket {
         id: object::new(ctx),
@@ -296,12 +296,12 @@ public fun modify_order_owner(
     }
 }
 
-public fun set_collateral_type(
+public fun set_collateral_type<T>(
     _: &PremarketAdminCap,
     market: &mut PreMarket,
-    coin_type: TypeName,
     minimum_amount: u64,
 ) {
+    let coin_type = type_name::get<T>();
     let collateral = Collateral {
         coin_type,
         minimum_amount,
@@ -310,15 +310,27 @@ public fun set_collateral_type(
     vec_map::insert(&mut market.collateral_types, coin_type, collateral);
 }
 
-public fun remove_collateral_type(
-    _: &PremarketAdminCap,
-    market: &mut PreMarket,
-    coin_type: TypeName,
-) {
+public fun remove_collateral_type<T>(_: &PremarketAdminCap, market: &mut PreMarket) {
+    let coin_type = type_name::get<T>();
     vec_map::remove(&mut market.collateral_types, &coin_type);
 }
 
-public fun set_resolution(_: &PremarketAdminCap, market: &mut PreMarket, resolution: Resolution) {
+public fun set_resolution<C>(
+    _: &PremarketAdminCap,
+    market: &mut PreMarket,
+    settlement_start: u64,
+    delivery_before: u64,
+    rate: u64,
+    clock: &Clock,
+) {
+    let resolution = Resolution {
+        resolved_at: clock.timestamp_ms(),
+        settlement_start,
+        delivery_before,
+        coin_type: type_name::get<C>(),
+        rate,
+    };
+
     market.resolution.swap_or_fill(resolution);
 }
 
@@ -328,11 +340,11 @@ public fun create_order<T>(
     market: &mut PreMarket,
     order_owner_table: &mut OrderOwnerTable,
     is_buy: bool,
-    collateral: Balance<T>,
+    collateral: Coin<T>,
     rate: u64,
-    minimum_fill_amount: Option<u64>,
-    ctx: &mut TxContext,
+    can_partially_fill: bool,
     clock: &Clock,
+    ctx: &mut TxContext,
 ) {
     // check market is not paused
     assert!(!market.is_paused, E_MARKET_PAUSED);
@@ -349,14 +361,9 @@ public fun create_order<T>(
     assert!(collateral_type_info.is_some(), E_INVALID_COLLATERAL_TYPE);
     // check collateral amount
     assert!(
-        collateral_type_info.borrow().minimum_amount <= balance::value(&collateral),
+        collateral_type_info.borrow().minimum_amount <= collateral.value(),
         E_INSUFFICIENT_COLLATERAL,
     );
-
-    // check minimum fill amount
-    if (minimum_fill_amount.is_some()) {
-        assert!(*minimum_fill_amount.borrow() <= collateral.value(), E_INVALID_MINIMUM_FILL_AMOUNT);
-    };
 
     let order_id = object::new(ctx);
 
@@ -364,9 +371,9 @@ public fun create_order<T>(
         market_id: object::id(market),
         order_id: *order_id.as_inner(),
         is_buy,
-        can_partially_fill: minimum_fill_amount.is_some(),
+        can_partially_fill,
         rate,
-        amount: collateral.value(),
+        collateral_amount: collateral.value(),
         collateral_type,
     });
 
@@ -375,9 +382,9 @@ public fun create_order<T>(
         id: order_id,
         market_id: object::id(market),
         is_buy,
-        collateral,
+        collateral: collateral.into_balance(),
         rate,
-        minimum_fill_amount,
+        can_partially_fill,
         filled_collateral: 0,
         created_at: clock.timestamp_ms(),
         by: ctx.sender(),
@@ -400,8 +407,8 @@ public fun cancel_order<T>(
     premarket: &mut PreMarket,
     order_owner_table: &mut OrderOwnerTable,
     order_id: ID,
-    ctx: &mut TxContext,
     clock: &Clock,
+    ctx: &mut TxContext,
 ): Coin<T> {
     let Order { id, mut collateral, .. } = bag::remove(
         &mut premarket.orders,
@@ -446,16 +453,19 @@ public fun fill_order<T>(
     order_owner_table: &mut OrderOwnerTable,
     order_id: ID,
     collateral: Balance<T>,
-    ctx: &mut TxContext,
     clock: &Clock,
+    ctx: &mut TxContext,
 ) {
     let market_id = object::id(market);
     let order: &mut Order<T> = market.orders.borrow_mut(order_id);
+    let minimum_fill_amount = market.collateral_types.get(&type_name::get<T>()).minimum_amount;
 
     // check if not order owner
     assert!(order.by != ctx.sender(), E_INVALID_ORDER_OWNER);
     // check if collateral is not too much
     assert!(collateral.value() <= order.collateral.value(), E_TOO_MUCH_COLLATERAL);
+    // check if collateral is enough to fill the order
+    assert!(collateral.value() >= minimum_fill_amount, E_INSUFFICIENT_COLLATERAL);
 
     // check if order is fully filled
     let will_delete_order = collateral.value() == order.collateral.value();
@@ -463,17 +473,8 @@ public fun fill_order<T>(
 
     // check if order is partially filled
     if (!will_delete_order) {
-        // check if minimum fill amount is set
-        assert!(order.minimum_fill_amount.is_some(), E_INVALID_MINIMUM_FILL_AMOUNT);
-        let minimum_fill_amount = *order.minimum_fill_amount.borrow();
-        // check if collateral is enough to fill the order
-        assert!(collateral.value() >= minimum_fill_amount, E_INSUFFICIENT_COLLATERAL);
-        // also check if amount left is enough to fill another the order
-        assert!(amount_left >= minimum_fill_amount, E_INSUFFICIENT_COLLATERAL);
-        // if amount left is less than 2 * minimum_fill_amount, set minimum_fill_amount to amount_left
-        if (amount_left < 2 * minimum_fill_amount) {
-            order.minimum_fill_amount.swap(amount_left);
-        }
+        // ensure that amount left is more than minimum fill amount
+        assert!(amount_left >= minimum_fill_amount, E_AMOUNT_LEFT_NOT_ENOUGH);
     };
 
     let filled_order_id = object::new(ctx);
@@ -483,8 +484,8 @@ public fun fill_order<T>(
         order_id: *filled_order_id.as_inner(),
         filled_order_id: *filled_order_id.as_inner(),
         rate: order.rate,
-        amount: collateral.value(),
-        amount_left,
+        maker_collateral_amount_left: amount_left,
+        collateral_amount: collateral.value(),
         collateral_type: type_name::get<T>(),
     });
 
@@ -542,8 +543,8 @@ public fun settle_order<T, C>(
     order_owner_table: &mut OrderOwnerTable,
     filled_order_id: ID,
     final_coin: Coin<C>,
-    ctx: &mut TxContext,
     clock: &Clock,
+    ctx: &mut TxContext,
 ): Coin<T> {
     // check if market is resolved and settlement is before delivery time
     assert!(market.resolution.is_some(), E_MARKET_NOT_RESOLVED);
@@ -683,8 +684,8 @@ public fun close_order<T>(
     market: &mut PreMarket,
     order_owner_table: &mut OrderOwnerTable,
     filled_order_id: ID,
-    ctx: &mut TxContext,
     clock: &Clock,
+    ctx: &mut TxContext,
 ): Coin<T> {
     // check if past delivery time
     assert!(market.resolution.is_some(), E_MARKET_NOT_RESOLVED);
