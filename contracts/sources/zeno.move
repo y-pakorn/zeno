@@ -576,11 +576,11 @@ public fun settle_order<T, C>(
     // calculate the rate that the taker will get
     let mut final_coin_correct_balance = maker_collateral.value() as u128;
     // decimal adjustment
+    final_coin_correct_balance = final_coin_correct_balance * (MIST as u128);
     final_coin_correct_balance = final_coin_correct_balance / (resolution.rate as u128);
-    final_coin_correct_balance = final_coin_correct_balance * (MIST as u128);
     // convert to coin rate
-    final_coin_correct_balance = final_coin_correct_balance / (rate as u128);
     final_coin_correct_balance = final_coin_correct_balance * (MIST as u128);
+    final_coin_correct_balance = final_coin_correct_balance / (rate as u128);
     let final_coin_correct_balance = final_coin_correct_balance as u64;
     assert!(final_coin.value() >= final_coin_correct_balance, E_INVALID_FINAL_COIN_AMOUNT);
 
