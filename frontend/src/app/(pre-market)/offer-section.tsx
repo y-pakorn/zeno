@@ -1,4 +1,5 @@
-import { useMemo } from "react"
+import { memo, useMemo, useState } from "react"
+import { useCurrentAccount } from "@mysten/dapp-kit"
 import { ColumnDef } from "@tanstack/react-table"
 import BigNumber from "bignumber.js"
 import _ from "lodash"
@@ -21,6 +22,12 @@ import { DataTable } from "@/components/data-table"
 import { useMarket } from "./market-provider"
 import { useOrder } from "./order-provider"
 
+type Filter = {
+  type: "buy" | "sell" | "all"
+  collateral?: string
+  fillType?: "full" | "partial"
+}
+
 export function CollateralDisplay({
   collateral,
 }: {
@@ -39,7 +46,13 @@ export function OfferSection({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { filters, setFilters, market } = useMarket()
+  const { market } = useMarket()
+
+  const [filters, setFilters] = useState<Filter>({
+    type: "all",
+    collateral: undefined,
+    fillType: undefined,
+  })
 
   return (
     <div className={cn("space-y-2", className)} {...props}>
@@ -124,14 +137,45 @@ export function OfferSection({
           </DropdownMenuContent>
         </DropdownMenu> */}
       </div>
-      <OfferTable />
+      <OfferTable filters={filters} />
     </div>
   )
 }
 
-function OfferTable() {
-  const { offers, market, collateralPrices, filters } = useMarket()
+const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
+  const { offers } = useMarket()
   const { selectOrder, selectedOrderIds, unselectOrder } = useOrder()
+
+  const { buy, sell } = useMemo(() => {
+    return {
+      buy: _.chain(offers)
+        .filter((o) => o.type === "buy")
+        .filter((o) =>
+          filters.collateral
+            ? o.collateral.coinType === filters.collateral
+            : true
+        )
+        .filter((o) =>
+          filters.fillType ? o.fillType === filters.fillType : true
+        )
+        .sortBy("price")
+        .value(),
+      sell: _.chain(offers)
+        .filter((o) => o.type === "sell")
+        .filter((o) =>
+          filters.collateral
+            ? o.collateral.coinType === filters.collateral
+            : true
+        )
+        .filter((o) =>
+          filters.fillType ? o.fillType === filters.fillType : true
+        )
+        .sortBy("price")
+        .value(),
+    }
+  }, [offers, filters])
+
+  const account = useCurrentAccount()
 
   const columns: ColumnDef<Offer>[] = useMemo(
     () => [
@@ -195,10 +239,16 @@ function OfferTable() {
               variant="ghost"
               size="xs"
               className={cn(
-                type === "buy" ? "text-error" : "text-success",
+                account?.address === row.original.by
+                  ? false
+                  : type === "buy"
+                    ? "text-error"
+                    : "text-success",
                 selected && "text-primary"
               )}
+              disabled={account?.address === row.original.by}
               onClick={() => {
+                if (!account) return
                 if (selected) {
                   unselectOrder(row.original.id)
                 } else {
@@ -206,13 +256,19 @@ function OfferTable() {
                 }
               }}
             >
-              {selected ? "Cancel" : type === "buy" ? "Sell" : "Buy"}
+              {account?.address === row.original.by
+                ? "My Order"
+                : selected
+                  ? "Cancel"
+                  : type === "buy"
+                    ? "Sell"
+                    : "Buy"}
             </Button>
           )
         },
       },
     ],
-    [selectedOrderIds, selectOrder, unselectOrder]
+    [selectedOrderIds, selectOrder, unselectOrder, account?.address]
   )
 
   return (
@@ -223,7 +279,7 @@ function OfferTable() {
           filters.type === "all" && "col-span-1"
         )}
         columns={columns}
-        data={offers.shownSell}
+        data={sell}
         transparent
         rowClassName={(row) => {
           const offer = row.original as Offer
@@ -238,7 +294,7 @@ function OfferTable() {
           filters.type === "all" && "col-span-1"
         )}
         columns={columns}
-        data={offers.shownBuy}
+        data={buy}
         transparent
         rowClassName={(row) => {
           const offer = row.original as Offer
@@ -249,4 +305,4 @@ function OfferTable() {
       />
     </div>
   )
-}
+})

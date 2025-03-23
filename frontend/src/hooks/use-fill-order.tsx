@@ -51,7 +51,6 @@ export const useFillOrder = () => {
             })()
 
       for (const order of fillOrderParams.orders) {
-        console.log(order, collateralType)
         const amount = order.collateral.amount
           .shiftedBy(order.collateral.exponent || 0)
           .integerValue(BigNumber.ROUND_CEIL)

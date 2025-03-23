@@ -50,11 +50,11 @@ export const preMarkets: { [key in Network]: PreMarket } = {
   devnet: {
     id: "devnet",
     packageId:
-      "0x042a63d7d65dac2cfca6ab26c378a11e6cdf851a18001b96af2867bcf734fa12",
-    marketId:
-      "0xf794b23f8a94c720fbb2203d2801de5f027dcee1f722d4b93065d0ef1da5da77",
+      "0x73571d4383a118e1190373bc5c193a428eaca5d3d07a1f612bf171918b58b8a3",
     orderOwnerTableId:
-      "0xb324c8dd0e27fb1aca35aeb673911cb99c3a5260f56a5df2101a146b8ca95eb3",
+      "0x50d137b2b8d69d875fd8cb8db69ea186bb4e0a10e52ca1a3d9cb4b17389a6ca2",
+    marketId:
+      "0x98df2875040e034c88572c65ebc7fc8e94946dcf220b25804bdf2ccb4e12fdde",
     name: "Walrus",
     ticker: "WAL",
     icon: "https://img.cryptorank.io/coins/walrus1727864479768.png",

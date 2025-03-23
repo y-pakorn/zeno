@@ -76,19 +76,14 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       (c) => c.coinType === order?.collateral.coinType
     )
     if (!order || !collateral) return
-    const shiftedRate = order.rate.shiftedBy(-9)
-    const totalCollateralAmount = orderIds
-      .reduce((acc, orderId) => {
-        const order = orderMap[orderId]
-        return acc.plus(order.collateral.amount)
-      }, new BigNumber(0))
-      .shiftedBy(-collateral.exponent)
-    const totalAmount = orderIds
-      .reduce((acc, orderId) => {
-        const order = orderMap[orderId]
-        return acc.plus(order.collateral.amount.dividedBy(shiftedRate))
-      }, new BigNumber(0))
-      .shiftedBy(-collateral.exponent)
+    const totalCollateralAmount = orderIds.reduce((acc, orderId) => {
+      const order = orderMap[orderId]
+      return acc.plus(order.collateral.amount)
+    }, new BigNumber(0))
+    const totalAmount = orderIds.reduce((acc, orderId) => {
+      const order = orderMap[orderId]
+      return acc.plus(order.collateral.amount.dividedBy(order.rate))
+    }, new BigNumber(0))
     const averagePrice = totalAmount.dividedBy(totalCollateralAmount)
     const averagePriceUsd = averagePrice
       .dividedBy(
@@ -160,12 +155,17 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
             collateral: {
               coinType: order.collateral.coinType,
               amount: order.collateral.amount,
+              exponent: order.collateral.exponent,
             },
           }
         }),
       })
     },
   })
+
+  // const myOpenOrders = useMemo(() => {
+  //   if (!openOrders.data) return []
+  // }, [openOrders.data])
 
   return (
     <OrderContext.Provider

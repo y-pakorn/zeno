@@ -11,10 +11,13 @@ export type Order = {
 
 export type OpenOrder = {
   id: string
+  by: string
   createdAt: Date
   fillType: "partial" | "full"
   type: "buy" | "sell"
   collateral: {
+    icon: string
+    exponent: number
     coinType: string
     amount: BigNumber
     filledAmount: BigNumber
@@ -22,17 +25,9 @@ export type OpenOrder = {
   rate: BigNumber
 }
 
-export type Offer = {
-  id: string
+export type Offer = OpenOrder & {
   price: BigNumber
   amount: BigNumber
-  fillType: OpenOrder["fillType"]
-  type: OpenOrder["type"]
-  collateral: {
-    icon: string
-    coinType: string
-    amount: BigNumber
-  }
 }
 
 export type CreateOrder = {

@@ -71,11 +71,11 @@ export function MakerOrder() {
             // check if the order price is better than the best offer
             if (data.type === "buy") {
               return offers.sell.length > 0
-                ? offers.sell.some((o) => o.price.gt(data.pricePerToken))
+                ? offers.sell.some((o) => o.price.gte(data.pricePerToken))
                 : true
             }
             return offers.buy.length > 0
-              ? offers.buy.some((o) => o.price.lt(data.pricePerToken))
+              ? offers.buy.some((o) => o.price.lte(data.pricePerToken))
               : true
           },
           {
@@ -183,7 +183,7 @@ export function MakerOrder() {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Review Order</h2>
         <Tabs
-          defaultValue={type}
+          value={type}
           onValueChange={(v) => setValue("type", v as "buy" | "sell")}
         >
           <TabsList variant="bottomOutline">
