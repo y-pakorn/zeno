@@ -24,6 +24,13 @@ const icons = {
       {...props}
     />
   ),
+  sui: ({ className, ...props }: ComponentProps<"img">) => (
+    <img
+      src="https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png"
+      className={cn("size-4 object-contain object-center", className)}
+      {...props}
+    />
+  ),
 }
 
 export const Icons: IconsType = icons

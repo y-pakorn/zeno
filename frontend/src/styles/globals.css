@@ -5,11 +5,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-body: var(--font-body);
+  --font-body: "Instrument Sans";
   --font-heading: var(--font-heading);
 
   --color-border: hsl(var(--border));
-  --color-border-secondary: hsl(var(--border-secondary));
+  --color-border-primary: hsl(var(--border-primary));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-background: hsl(var(--background));
@@ -166,8 +166,8 @@
     --error: 4 93% 69%;
     --success: 150 57% 54%;
 
-    --border: 220 8% 24%;
-    --border-secondary: 220 16% 16%;
+    --border: 220 16% 16%;
+    --border-primary: 220 8% 24%;
     --input: 220 8% 24%;
     --ring: 220 8% 24%;
   }

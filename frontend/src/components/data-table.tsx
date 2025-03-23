@@ -1,12 +1,15 @@
 "use client"
 
-import { memo } from "react"
+import { ComponentProps, memo } from "react"
 import {
   flexRender,
   getCoreRowModel,
+  Row,
   TableOptions,
   useReactTable,
 } from "@tanstack/react-table"
+
+import { cn } from "@/lib/utils"
 
 import {
   Table,
@@ -20,10 +23,19 @@ import {
 export const DataTable = memo(function DataTable<TData, TValue>({
   data,
   columns,
-  ...options
-}: Partial<Omit<TableOptions<TData>, "data" | "columns">> & {
+  transparent = false,
+  options,
+  rowClassName,
+  rowProps,
+  className,
+  ...props
+}: ComponentProps<"div"> & {
   columns: any
   data: TData[]
+  transparent?: boolean
+  rowClassName?: (row: Row<TData>) => string
+  rowProps?: (row: Row<TData>) => React.ComponentProps<"tr">
+  options?: Partial<Omit<TableOptions<TData>, "data" | "columns">>
 }) {
   const table = useReactTable({
     data,
@@ -33,7 +45,7 @@ export const DataTable = memo(function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="rounded-md border">
+    <div className={cn("rounded-2xl border", className)} {...props}>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -42,7 +54,10 @@ export const DataTable = memo(function DataTable<TData, TValue>({
                 return (
                   <TableHead
                     key={header.id}
-                    className="bg-secondary text-quaternary py-3.5 font-semibold first:rounded-tl-md last:rounded-tr-md"
+                    className={cn(
+                      "text-quaternary font-semibold first:rounded-tl-md last:rounded-tr-md",
+                      !transparent && "bg-secondary"
+                    )}
                   >
                     {header.isPlaceholder
                       ? null
@@ -62,9 +77,11 @@ export const DataTable = memo(function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                {...rowProps?.(row)}
+                className={rowClassName?.(row)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-3.5">
+                  <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

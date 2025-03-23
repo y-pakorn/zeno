@@ -16,6 +16,8 @@ import { WalletProvider } from "@/components/wallet-provider"
 const body = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-body",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 })
 
 const heading = localFont({
@@ -91,8 +93,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          "bg-background font-body min-h-screen antialiased",
-          body.variable,
+          "bg-background font-heading min-h-screen antialiased",
+          // body.variable,
           heading.variable
         )}
       >
@@ -104,9 +106,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <WalletProvider>
             <SidebarProvider>
               <AppSidebar />
-              <main className="container flex min-h-screen flex-col">
-                <AppNavbar />
-                {children}
+              <main className="relative w-full">
+                <div className="container flex min-h-screen flex-col">
+                  <AppNavbar />
+                  {children}
+                </div>
               </main>
             </SidebarProvider>
           </WalletProvider>

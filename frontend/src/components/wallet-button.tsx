@@ -5,11 +5,9 @@ import Link from "next/link"
 import {
   ConnectModal,
   useAccounts,
-  useConnectWallet,
   useCurrentAccount,
   useDisconnectWallet,
   useSwitchAccount,
-  useWallets,
 } from "@mysten/dapp-kit"
 import type { WalletAccount } from "@mysten/wallet-standard"
 import {
@@ -23,7 +21,6 @@ import {
 
 import { cn, formatAddress } from "@/lib/utils"
 
-import { Avatar, AvatarFallback } from "./ui/avatar"
 import { Button } from "./ui/button"
 import {
   DropdownMenu,
@@ -67,7 +64,7 @@ function ConnectedWalletButtonContent({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
+          variant="active"
           rounded="full"
           {...props}
           className={cn("px-4!", className)}
