@@ -1,30 +1,17 @@
 import {
   createContext,
-  SetStateAction,
   useCallback,
   useContext,
   useMemo,
   useState,
 } from "react"
-import { SUI_COIN_TYPE } from "@/constants"
-import {
-  useCurrentAccount,
-  useCurrentWallet,
-  useSignAndExecuteTransaction,
-  useSuiClient,
-  useSuiClientMutation,
-} from "@mysten/dapp-kit"
-import { Transaction } from "@mysten/sui/transactions"
 import { useMutation, UseMutationResult } from "@tanstack/react-query"
 import BigNumber from "bignumber.js"
 import _ from "lodash"
-import { ExternalLink } from "lucide-react"
-import { toast } from "sonner"
 
-import { CreateOrder } from "@/types/order"
 import { useFillOrder } from "@/hooks/use-fill-order"
-import { useNetwork } from "@/components/wallet-provider"
 
+import { useBook } from "./book-provider"
 import { useMarket } from "./market-provider"
 
 type OrderContextType = {
@@ -61,7 +48,9 @@ export function useOrder() {
 }
 
 export function OrderProvider({ children }: { children: React.ReactNode }) {
-  const { openOrders, market, collateralPrices } = useMarket()
+  const { market, collateralPrices } = useMarket()
+  const { openOrders } = useBook()
+
   const [selectedOrderIds, setSelectedOrderIds] = useState<
     OrderContextType["selectedOrderIds"]
   >(new Set())

@@ -10,7 +10,13 @@ import {
 import BigNumber from "bignumber.js"
 
 import { Collateral, PreMarket } from "@/types/market"
-import { OpenOrder, OpenOrderEvent, OrderFilledEvent } from "@/types/order"
+import {
+  OpenOrder,
+  OpenOrderEvent,
+  OrderCancelledEvent,
+  OrderFilledEvent,
+} from "@/types/order"
+import { parseOpenOrder } from "@/lib/contract"
 
 export function triggerUpdateOpenOrders(
   queryClient: QueryClient,
@@ -18,6 +24,15 @@ export function triggerUpdateOpenOrders(
 ) {
   return queryClient.invalidateQueries({
     queryKey: ["open-order-events", marketId],
+  })
+}
+
+export function triggerUpdateCancelledOrders(
+  queryClient: QueryClient,
+  marketId: string
+) {
+  return queryClient.invalidateQueries({
+    queryKey: ["cancelled-orders-events", marketId],
   })
 }
 
@@ -29,6 +44,7 @@ export function triggerUpdateFilledOrders(
     queryKey: ["filled-orders-events", marketId],
   })
 }
+
 export function useOpenOrders({
   market,
   openOrderBagId,
@@ -92,6 +108,7 @@ export function useOpenOrders({
           collateral: {
             coinType,
             icon: collateral.icon,
+            ticker: collateral.ticker,
             exponent: collateral.exponent,
             amount: new BigNumber(eventData.collateral_amount).shiftedBy(
               -collateral.exponent
@@ -109,6 +126,33 @@ export function useOpenOrders({
         }
       )
       return insertedOrders
+    },
+  })
+
+  const _updateDataCancelled = useQuery({
+    queryKey: ["cancelled-orders-events", market.id],
+    enabled: !!query.data,
+    refetchInterval: 11 * 1000, // 11 seconds
+    queryFn: async () => {
+      const events = await client.queryEvents({
+        query: {
+          MoveEventType: `${market.packageId}::zeno::OrderCancelled`,
+        },
+        order: "descending",
+      })
+      const toRemoveIds: Set<string> = new Set()
+      for (const event of events.data) {
+        const eventData = event.parsedJson as OrderCancelledEvent
+        if (eventData.market_id !== market.marketId) continue
+        toRemoveIds.add(eventData.order_id)
+      }
+      queryClient.setQueryData<OpenOrder[]>(
+        ["open-orders", market.id],
+        (old) => {
+          return old?.filter((o) => !toRemoveIds.has(o.id))
+        }
+      )
+      return true
     },
   })
 
@@ -176,39 +220,4 @@ async function fetchAllDynamicFields(
   }
 
   return orders
-}
-
-function parseOpenOrder(object: any, collaterals: Collateral[]): OpenOrder {
-  const data = object.data?.content as any
-  const orderData = data.fields.value.fields
-  const collateralType = data.fields.value.type.match(/<(.+)>/)[1]
-  const collateral = collaterals.find((c) => c.coinType === collateralType)
-
-  if (!collateral) {
-    throw new Error(`Collateral not found: ${collateralType}`)
-  }
-
-  const rate = new BigNumber(orderData.rate).shiftedBy(-9)
-  const collateralAmount = new BigNumber(orderData.collateral).shiftedBy(
-    -collateral.exponent
-  )
-  const filledAmount = new BigNumber(orderData.filled_collateral).shiftedBy(
-    -collateral.exponent
-  )
-
-  return {
-    id: orderData.id.id,
-    createdAt: new Date(parseInt(orderData.created_at)),
-    collateral: {
-      coinType: collateralType,
-      icon: collateral.icon,
-      exponent: collateral.exponent,
-      amount: collateralAmount,
-      filledAmount,
-    },
-    fillType: orderData.can_partially_fill ? "partial" : "full",
-    type: orderData.is_buy ? "buy" : "sell",
-    rate,
-    by: orderData.by,
-  } satisfies OpenOrder
 }

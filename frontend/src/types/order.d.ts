@@ -17,12 +17,42 @@ export type OpenOrder = {
   type: "buy" | "sell"
   collateral: {
     icon: string
+    ticker: string
     exponent: number
     coinType: string
     amount: BigNumber
     filledAmount: BigNumber
   }
   rate: BigNumber
+}
+
+export type FilledOrder = {
+  id: string
+  maker: string
+  taker: string
+  type: "buy" | "sell"
+  collateral: {
+    ticker: string
+    icon: string
+    exponent: number
+    coinType: string
+    amount: BigNumber
+  }
+  rate: BigNumber
+  createdAt: Date
+  filledAt: Date
+}
+
+export type SettledOrder = {
+  id: string
+  claimer: string
+  balance: {
+    ticker: string
+    icon: string
+    exponent: number
+    amount: BigNumber
+  }
+  settledAt: Date
 }
 
 export type Offer = OpenOrder & {
@@ -54,6 +84,12 @@ export type FillOrder = {
   }[]
 }
 
+export type CancelOrder = {
+  market: Market
+  orderId: string
+  coinType: string
+}
+
 export type OpenOrderEvent = {
   can_partially_fill: boolean
   collateral_amount: string
@@ -76,4 +112,9 @@ export type OrderFilledEvent = {
   collateral_type: {
     name: string
   }
+}
+
+export type OrderCancelledEvent = {
+  market_id: string
+  order_id: string
 }

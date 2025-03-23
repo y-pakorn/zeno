@@ -2,16 +2,16 @@
 
 import { NAVBAR_HEIGHT } from "@/components/app-navbar"
 
+import { BookProvider } from "./book-provider"
 import { BANNER_HEIGHT, MarketBanner } from "./market-banner"
 import { MarketHeader } from "./market-header"
-import { MarketProvider } from "./market-provider"
 import { OfferSection } from "./offer-section"
 import { OrderProvider } from "./order-provider"
 import { OrderSection } from "./order-section"
 
 export default function Home() {
   return (
-    <MarketProvider>
+    <BookProvider>
       <OrderProvider>
         <MarketBanner />
         <div
@@ -27,6 +27,6 @@ export default function Home() {
           </div>
         </div>
       </OrderProvider>
-    </MarketProvider>
+    </BookProvider>
   )
 }

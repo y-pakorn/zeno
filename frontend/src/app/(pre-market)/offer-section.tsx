@@ -19,6 +19,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { DataTable } from "@/components/data-table"
 
+import { useBook } from "./book-provider"
 import { useMarket } from "./market-provider"
 import { useOrder } from "./order-provider"
 
@@ -66,6 +67,7 @@ export function OfferSection({
             setFilters({ ...filters, type: value as "all" | "buy" | "sell" })
           }
           size="lg"
+          className="*:px-6"
         >
           <ToggleGroupItem value="all">All</ToggleGroupItem>
           <ToggleGroupItem value="buy">Buy</ToggleGroupItem>
@@ -143,7 +145,7 @@ export function OfferSection({
 }
 
 const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
-  const { offers } = useMarket()
+  const { offers } = useBook()
   const { selectOrder, selectedOrderIds, unselectOrder } = useOrder()
 
   const { buy, sell } = useMemo(() => {

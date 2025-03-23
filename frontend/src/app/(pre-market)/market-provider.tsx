@@ -12,6 +12,7 @@ import { OnchainMarket, PreMarket } from "@/types/market"
 import { Offer, OpenOrder } from "@/types/order"
 import { preMarkets } from "@/config/market"
 import { useCollateralPrices } from "@/hooks/use-collateral-prices"
+import { MyOrders, useMyOrders } from "@/hooks/use-my-orders"
 import { useOnchainMarket } from "@/hooks/use-onchain-market"
 import { useOpenOrders } from "@/hooks/use-open-orders"
 import { useNetwork } from "@/components/wallet-provider"
@@ -23,9 +24,8 @@ export type MarketProviderContextType = {
   volume24h: number
   volumeTotal: number
   onchainMarket: UseQueryResult<OnchainMarket>
-  openOrders: UseQueryResult<OpenOrder[]>
-  offers: Offer[]
   collateralPrices: UseQueryResult<Record<string, BigNumber>>
+  myOrders: MyOrders
 }
 
 const MarketProviderContext = createContext<MarketProviderContextType>(
@@ -58,33 +58,16 @@ export const MarketProvider = ({ children }: { children: React.ReactNode }) => {
     marketId: market.marketId,
   })
 
-  const openOrders = useOpenOrders({
+  const myOrders = useMyOrders({
     market,
-    openOrderBagId: onchainMarket.data?.openOrdersBagId!,
-    enabled: !!onchainMarket.data?.openOrdersBagId,
+    ordersBagId: onchainMarket.data?.openOrdersBagId!,
+    filledOrdersBagId: onchainMarket.data?.filledOrdersBagId!,
+    settledOrdersBagId: onchainMarket.data?.settledOrdersBagId!,
   })
 
   const collateralPrices = useCollateralPrices({
     market,
   })
-
-  const offers = useMemo(() => {
-    const allOffers = _.chain(openOrders.data || [])
-      .map((order) => {
-        const price = order.rate.multipliedBy(
-          collateralPrices.data?.[order.collateral.coinType] || new BigNumber(0)
-        )
-        const amount = order.collateral.amount.dividedBy(order.rate)
-        const offer = {
-          ...order,
-          price,
-          amount,
-        }
-        return offer
-      })
-      .value()
-    return allOffers
-  }, [openOrders.data, collateralPrices.data])
 
   return (
     <MarketProviderContext.Provider
@@ -95,9 +78,8 @@ export const MarketProvider = ({ children }: { children: React.ReactNode }) => {
         volume24h,
         volumeTotal,
         onchainMarket,
-        openOrders,
-        offers,
         collateralPrices,
+        myOrders,
       }}
     >
       {children}

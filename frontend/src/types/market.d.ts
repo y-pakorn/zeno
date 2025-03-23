@@ -39,6 +39,7 @@ export type Resolution = {
   settlementStart: Date
   deliveryBefore: Date
   finalCoinType?: string
+  exponent?: number
 }
 
 export type OnchainMarket = {

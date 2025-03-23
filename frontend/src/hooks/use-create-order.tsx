@@ -13,6 +13,7 @@ import { toast } from "sonner"
 import { CreateOrder } from "@/types/order"
 import { useNetwork } from "@/components/wallet-provider"
 
+import { triggerUpdateMyOpenOrders } from "./use-my-orders"
 import { triggerUpdateOpenOrders } from "./use-open-orders"
 import { useSignAndExecute } from "./use-sign-and-execute"
 
@@ -80,6 +81,7 @@ export const useCreateOrder = () => {
       })
 
       await triggerUpdateOpenOrders(queryClient, createOrderParams.market.id)
+      await triggerUpdateMyOpenOrders(queryClient, createOrderParams.market.id)
 
       return tx
     },

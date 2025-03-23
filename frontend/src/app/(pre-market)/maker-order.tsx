@@ -70,12 +70,18 @@ export function MakerOrder() {
           (data) => {
             // check if the order price is better than the best offer
             if (data.type === "buy") {
-              return offers.sell.length > 0
-                ? offers.sell.some((o) => o.price.gte(data.pricePerToken))
+              const buyOffers = _.chain(offers)
+                .filter((o) => o.type === "buy")
+                .value()
+              return buyOffers.length > 0
+                ? buyOffers.some((o) => o.price.gte(data.pricePerToken))
                 : true
             }
-            return offers.buy.length > 0
-              ? offers.buy.some((o) => o.price.lte(data.pricePerToken))
+            const sellOffers = _.chain(offers)
+              .filter((o) => o.type === "sell")
+              .value()
+            return sellOffers.length > 0
+              ? sellOffers.some((o) => o.price.lte(data.pricePerToken))
               : true
           },
           {

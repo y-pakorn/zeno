@@ -11,6 +11,7 @@ import _ from "lodash"
 
 import { FillOrder } from "@/types/order"
 
+import { triggerUpdateMyFilledOrders } from "./use-my-orders"
 import { triggerUpdateFilledOrders } from "./use-open-orders"
 import { useSignAndExecute } from "./use-sign-and-execute"
 
@@ -74,6 +75,7 @@ export const useFillOrder = () => {
       })
 
       await triggerUpdateFilledOrders(queryClient, fillOrderParams.market.id)
+      await triggerUpdateMyFilledOrders(queryClient, fillOrderParams.market.id)
 
       return tx
     },
