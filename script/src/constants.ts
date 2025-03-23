@@ -16,16 +16,16 @@ export const keypair = Ed25519Keypair.fromSecretKey(secretKey);
 export const contracts = {
   devnet: {
     packageId:
-      "0x3a1a4e9883cc9d34bd7e02e288b243aa7befba69f2fa4842b954e5e7f5c112e8",
+      "0x73571d4383a118e1190373bc5c193a428eaca5d3d07a1f612bf171918b58b8a3",
     adminCap:
-      "0x405e10f5413d4ffe5b73fb24d3db81b6d2bea250ba7b44e094ecc7b5e254908b",
+      "0xbab1b01a034d47cf6fb7ec4253213234b15b640253af3c09163fc76e72be1e15",
     upgradeCap:
-      "0x302dde74c05f7b9abf9356ef449de74820eb7db94e2760972715337668638f79",
+      "0xa766b93d894c6e39f0ad1e84e698cd7a282fb9b192b76f912bdae268be60cf4d",
     orderOwnerTable:
-      "0x0abc2d94a36d3780f5a3557c5b2c419c553eb6f1635550de1ebdd8b459d7933b",
+      "0x50d137b2b8d69d875fd8cb8db69ea186bb4e0a10e52ca1a3d9cb4b17389a6ca2",
     markets: {
       longTermWal:
-        "0xe454be3a57c85bbe96e0e0ca7d6f8f96053d65558a4f6768f78c73f60bda92b5",
+        "0x98df2875040e034c88572c65ebc7fc8e94946dcf220b25804bdf2ccb4e12fdde",
     },
   },
   mainnet: {},
