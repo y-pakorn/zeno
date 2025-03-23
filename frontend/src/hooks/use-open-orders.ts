@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useSuiClient } from "@mysten/dapp-kit"
 import { SuiClient } from "@mysten/sui/client"
 import {
@@ -72,6 +72,7 @@ export function useOpenOrders({
     ...options,
   })
 
+  const [lastUpdated, setLastUpdated] = useState<number>(Date.now())
   const _updateDataOpen = useQuery({
     queryKey: ["open-order-events", market.id],
     enabled: !!query.data,
@@ -91,10 +92,11 @@ export function useOpenOrders({
       const ids = new Set(prevOrders?.map((o) => o.id))
       const insertedOrders: OpenOrder[] = []
       for (const event of events.data) {
+        if (parseInt(event.timestampMs!) < lastUpdated) continue
         const eventData = event.parsedJson as OpenOrderEvent
         if (eventData.market_id !== market.marketId) continue
         if (ids.has(eventData.order_id)) continue
-        const coinType = eventData.collateral_type.name.replace(/^0x0+/, "0x")
+        const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
         const collateral = market.collaterals.find(
           (c) => c.coinType === coinType
         )
@@ -125,7 +127,8 @@ export function useOpenOrders({
           return [...(old || []), ...insertedOrders]
         }
       )
-      return insertedOrders
+      setLastUpdated(Date.now())
+      return true
     },
   })
 

@@ -30,10 +30,10 @@ export function OrderSection() {
 
   return (
     <div
-      className="shrink-0 rounded-2xl border *:space-y-2 *:p-4"
+      className="flex h-full shrink-0 flex-col rounded-2xl border"
       style={{ width: ORDER_SECTION_WIDTH }}
     >
-      <div>
+      <div className="space-y-2 p-4">
         {!isTaker ? (
           <>
             <Button
@@ -62,11 +62,11 @@ export function OrderSection() {
           </>
         )}
       </div>
-      <Separator className="p-0!" />
-      <div>
+      <Separator className="p-0" />
+      <div className="flex min-h-0 flex-1 flex-col space-y-2 p-4">
         <h2 className="text-sm font-bold">My Open Orders</h2>
-        <ScrollArea className="h-[200px]">
-          <div className="space-y-2 overflow-y-auto">
+        <ScrollArea className="max-h-full min-h-0 flex-1">
+          <div className="h-full space-y-2">
             <MyOpenOrder />
           </div>
         </ScrollArea>
@@ -85,6 +85,14 @@ export function MyOpenOrder() {
   const [selectedOrder, setSelectedOrder] = useState<OpenOrder | null>(null)
 
   const { mutateAsync: cancelOrder, isPending: isCancelling } = useCancelOrder()
+
+  if (!openOrders.data?.length) {
+    return (
+      <div className="flex h-full flex-1 flex-col items-center justify-center">
+        <div className="text-muted-foreground text-sm">No open orders</div>
+      </div>
+    )
+  }
 
   return (
     <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>

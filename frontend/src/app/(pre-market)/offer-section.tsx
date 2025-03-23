@@ -160,7 +160,7 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
         .filter((o) =>
           filters.fillType ? o.fillType === filters.fillType : true
         )
-        .sortBy("price")
+        .sortBy((p) => -p.price)
         .value(),
       sell: _.chain(offers)
         .filter((o) => o.type === "sell")
@@ -172,7 +172,7 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
         .filter((o) =>
           filters.fillType ? o.fillType === filters.fillType : true
         )
-        .sortBy("price")
+        .sortBy((p) => p.price)
         .value(),
     }
   }, [offers, filters])

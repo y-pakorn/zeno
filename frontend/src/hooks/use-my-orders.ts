@@ -110,8 +110,9 @@ export const useMyOrders = ({
   const client = useSuiClient()
 
   const orders = useQuery({
-    queryKey: ["my-open-orders", market.id],
-    enabled: !!orderOwnerTableHandle.data?.orderHandle && !!ordersBagId,
+    queryKey: ["my-open-orders", market.id, account?.address],
+    enabled:
+      !!orderOwnerTableHandle.data?.orderHandle && !!ordersBagId && !!account,
     queryFn: async () => {
       const orderIds = await client.getDynamicFields({
         parentId: orderOwnerTableHandle.data!.orderHandle,
@@ -135,9 +136,11 @@ export const useMyOrders = ({
   })
 
   const filledOrders = useQuery({
-    queryKey: ["my-filled-orders", market.id],
+    queryKey: ["my-filled-orders", market.id, account?.address],
     enabled:
-      !!orderOwnerTableHandle.data?.filledOrderHandle && !!filledOrdersBagId,
+      !!orderOwnerTableHandle.data?.filledOrderHandle &&
+      !!filledOrdersBagId &&
+      !!account,
     queryFn: async () => {
       const filledOrderIds = await client.getDynamicFields({
         parentId: orderOwnerTableHandle.data!.filledOrderHandle,
@@ -161,9 +164,11 @@ export const useMyOrders = ({
   })
 
   const settledOrders = useQuery({
-    queryKey: ["my-settled-orders", market.id],
+    queryKey: ["my-settled-orders", market.id, account?.address],
     enabled:
-      !!orderOwnerTableHandle.data?.settledOrderHandle && !!settledOrdersBagId,
+      !!orderOwnerTableHandle.data?.settledOrderHandle &&
+      !!settledOrdersBagId &&
+      !!account,
     queryFn: async () => {
       const settledOrderIds = await client.getDynamicFields({
         parentId: orderOwnerTableHandle.data!.settledOrderHandle,

@@ -21,7 +21,7 @@ export default function Home() {
           }}
         >
           <MarketHeader />
-          <div className="flex gap-4">
+          <div className="flex h-[730px] gap-4">
             <OfferSection className="w-full" />
             <OrderSection />
           </div>
