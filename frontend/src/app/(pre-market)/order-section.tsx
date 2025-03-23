@@ -1,7 +1,7 @@
 import { useState } from "react"
 import dayjs from "dayjs"
 import _ from "lodash"
-import { ChevronLeft, Loader2, Plus } from "lucide-react"
+import { Bookmark, ChevronLeft, Loader2, Plus, Receipt } from "lucide-react"
 
 import { OpenOrder } from "@/types/order"
 import { useCancelOrder } from "@/hooks/use-cancel-order"
@@ -65,11 +65,7 @@ export function OrderSection() {
       <Separator className="p-0" />
       <div className="flex min-h-0 flex-1 flex-col space-y-2 p-4">
         <h2 className="text-sm font-bold">My Open Orders</h2>
-        <ScrollArea className="max-h-full min-h-0 flex-1">
-          <div className="h-full space-y-2">
-            <MyOpenOrder />
-          </div>
-        </ScrollArea>
+        <MyOpenOrder />
       </div>
     </div>
   )
@@ -88,108 +84,121 @@ export function MyOpenOrder() {
 
   if (!openOrders.data?.length) {
     return (
-      <div className="flex h-full flex-1 flex-col items-center justify-center">
-        <div className="text-muted-foreground text-sm">No open orders</div>
+      <div className="flex flex-1 flex-col items-center justify-center gap-2 opacity-20">
+        <Bookmark className="text-brand size-12" />
+        <div className="text-sm font-medium">No Order Placed</div>
       </div>
     )
   }
 
   return (
     <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-      {openOrders.data?.map((order) => {
-        const amount = order.collateral.amount.div(order.rate)
-        const price = order.rate.multipliedBy(
-          collateralPrices.data?.[order.collateral.coinType] || 0
-        )
-        return (
-          <div
-            key={order.id}
-            className="bg-secondary space-y-2 rounded-xl px-4 py-3 text-xs font-medium"
-          >
-            <div className="flex items-center gap-2">
-              <img src={order.collateral.icon} className="size-4 shrink-0" />
-              <div className="text-sm font-bold">{order.collateral.ticker}</div>
-              <Badge variant={order.type === "buy" ? "success" : "error"}>
-                {_.startCase(order.type)}
-              </Badge>
-              <div className="text-quaternary ml-auto text-xs">
-                {dayjs(order.createdAt).format("HH:mm DD/MM/YY")}
+      <ScrollArea className="min-h-0 flex-1">
+        <div className="h-full space-y-2">
+          {openOrders.data?.map((order) => {
+            const amount = order.collateral.amount.div(order.rate)
+            const price = order.rate.multipliedBy(
+              collateralPrices.data?.[order.collateral.coinType] || 0
+            )
+            return (
+              <div
+                key={order.id}
+                className="bg-secondary space-y-2 rounded-xl px-4 py-3 text-xs font-medium"
+              >
+                <div className="flex items-center gap-2">
+                  <img
+                    src={order.collateral.icon}
+                    className="size-4 shrink-0"
+                  />
+                  <div className="text-sm font-bold">
+                    {order.collateral.ticker}
+                  </div>
+                  <Badge variant={order.type === "buy" ? "success" : "error"}>
+                    {_.startCase(order.type)}
+                  </Badge>
+                  <div className="text-quaternary ml-auto text-xs">
+                    {dayjs(order.createdAt).format("HH:mm DD/MM/YY")}
+                  </div>
+                </div>
+                <Separator className="mt-2" />
+                <div className="*:odd:text-muted-foreground grid grid-cols-2 gap-1 *:even:flex *:even:items-center *:even:justify-end *:even:gap-2 *:even:text-end *:even:font-semibold">
+                  <div>Amount</div>
+                  <div>
+                    {amount.toFormat(4)}{" "}
+                    <img src={market.icon} className="size-4 shrink-0" />
+                  </div>
+                  <div>Collateral</div>
+                  <div>
+                    {order.collateral.amount.toFormat(4)}{" "}
+                    <img
+                      src={order.collateral.icon}
+                      className="size-4 shrink-0"
+                    />
+                  </div>
+                  <div>Price</div>
+                  <div>${price.toFormat(4)}</div>
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setSelectedOrder(order)}
+                >
+                  Cancel
+                </Button>
               </div>
+            )
+          })}
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you sure to cancel this order?</DialogTitle>
+              <DialogDescription>
+                Canceling the order might have associated fee to proceed.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center gap-2 text-xs font-medium">
+              <div>Fee</div>
+              <div className="ml-auto">
+                {market.fee.cancel
+                  ? selectedOrder?.collateral.amount
+                      .multipliedBy(market.fee.cancel)
+                      .toFormat(4)
+                  : "-"}
+              </div>
+              <img
+                src={selectedOrder?.collateral.icon}
+                className="size-4 shrink-0"
+              />
             </div>
-            <Separator className="mt-2" />
-            <div className="*:odd:text-muted-foreground grid grid-cols-2 gap-1 *:even:flex *:even:items-center *:even:justify-end *:even:gap-2 *:even:text-end *:even:font-semibold">
-              <div>Amount</div>
-              <div>
-                {amount.toFormat(4)}{" "}
-                <img src={market.icon} className="size-4 shrink-0" />
-              </div>
-              <div>Collateral</div>
-              <div>
-                {order.collateral.amount.toFormat(4)}{" "}
-                <img src={order.collateral.icon} className="size-4 shrink-0" />
-              </div>
-              <div>Price</div>
-              <div>${price.toFormat(4)}</div>
-            </div>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => setSelectedOrder(order)}
-            >
-              Cancel
-            </Button>
-          </div>
-        )
-      })}
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Are you sure to cancel this order?</DialogTitle>
-          <DialogDescription>
-            Canceling the order might have associated fee to proceed.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex items-center gap-2 text-xs font-medium">
-          <div>Fee</div>
-          <div className="ml-auto">
-            {market.fee.cancel
-              ? selectedOrder?.collateral.amount
-                  .multipliedBy(market.fee.cancel)
-                  .toFormat(4)
-              : "-"}
-          </div>
-          <img
-            src={selectedOrder?.collateral.icon}
-            className="size-4 shrink-0"
-          />
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline" disabled={isCancelling}>
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                variant="destructive"
+                disabled={isCancelling}
+                onClick={async () => {
+                  await cancelOrder({
+                    market,
+                    orderId: selectedOrder!.id,
+                    coinType: selectedOrder!.collateral.coinType,
+                  })
+                  setSelectedOrder(null)
+                }}
+              >
+                {isCancelling ? (
+                  <>
+                    Cancelling <Loader2 className="animate-spin" />
+                  </>
+                ) : (
+                  "Confirm"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
         </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline" disabled={isCancelling}>
-              Cancel
-            </Button>
-          </DialogClose>
-          <Button
-            variant="destructive"
-            disabled={isCancelling}
-            onClick={async () => {
-              await cancelOrder({
-                market,
-                orderId: selectedOrder!.id,
-                coinType: selectedOrder!.collateral.coinType,
-              })
-              setSelectedOrder(null)
-            }}
-          >
-            {isCancelling ? (
-              <>
-                Cancelling <Loader2 className="animate-spin" />
-              </>
-            ) : (
-              "Confirm"
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+      </ScrollArea>
     </Dialog>
   )
 }
