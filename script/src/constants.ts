@@ -16,14 +16,14 @@ export const keypair = Ed25519Keypair.fromSecretKey(secretKey);
 export const contracts = {
   devnet: {
     packageId:
-      "0xa2ac3ad631f63c99a21f7f818648d67e864e74c7abe9ea5a04b2240950fb816d",
+      "0xb0e9f4ea46291140f0e2b333b926a0428d9940c484194c2f83a80505aeccce64",
     adminCap:
-      "0x3d97689fb4fceb15dfa122ac6b90fc0aae0bdf57d8492b89b5624732a2473f35",
+      "0x9bfe73de40d38e35dbec1a58fdcca85c0e4dec0ded2641966b39987c8956983f",
     upgradeCap:
-      "0x0ab9d3bcaf4918838484316fdbc8b6ffb7185f7f5b60a51524a27050bb470ff3",
+      "0x5a478aac774d502b4ffa6ecae42839a5a6c515230637e4939ece869a8ec16549",
     markets: {
       longTermWal:
-        "0x6092b7e6440378b9c3717a446ea91efa27d4729bb88ab21fce245bced31fc005",
+        "0xbf08ab9c43f930593237084550f7d4daf9b9663785d5053665941e296168fb30",
     },
   },
   mainnet: {},

@@ -39,7 +39,7 @@ export type FilledOrder = {
     amount: BigNumber
   }
   rate: BigNumber
-  createdAt: Date
+  // createdAt: Date
   filledAt: Date
 }
 
@@ -112,6 +112,9 @@ export type OrderFilledEvent = {
   collateral_type: {
     name: string
   }
+  is_buy: boolean
+  maker: string
+  taker: string
 }
 
 export type OrderCancelledEvent = {

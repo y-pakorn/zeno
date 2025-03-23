@@ -160,8 +160,10 @@ public struct OrderFilled has copy, drop, store {
     maker_collateral_amount_left: u64,
     collateral_amount: u64,
     collateral_type: TypeName,
+    is_buy: bool,
     maker: address,
     taker: address,
+    created_at: u64,
 }
 
 public struct OrderCancelled has copy, drop, store {
@@ -517,7 +519,9 @@ public fun fill_order<T>(
         maker_collateral_amount_left: amount_left,
         collateral_amount: collateral.value(),
         collateral_type: type_name::get<T>(),
+        is_buy: order.is_buy,
         maker: order.by,
+        created_at: order.created_at,
         taker: ctx.sender(),
     });
 

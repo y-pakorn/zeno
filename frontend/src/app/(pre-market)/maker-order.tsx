@@ -73,14 +73,14 @@ export function MakerOrder() {
             // check if the order price is better than the best offer
             if (data.type === "buy") {
               const buyOffers = _.chain(offers)
-                .filter((o) => o.type === "buy")
+                .filter((o) => o.type === "sell")
                 .value()
               return buyOffers.length > 0
                 ? buyOffers.some((o) => o.price.gte(data.pricePerToken))
                 : true
             }
             const sellOffers = _.chain(offers)
-              .filter((o) => o.type === "sell")
+              .filter((o) => o.type === "buy")
               .value()
             return sellOffers.length > 0
               ? sellOffers.some((o) => o.price.lte(data.pricePerToken))

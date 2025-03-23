@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import dayjs from "dayjs"
 import _ from "lodash"
-import { Bookmark, ChevronLeft, Loader2, Plus, Receipt } from "lucide-react"
+import { Bookmark, ChevronLeft, Loader2, Plus } from "lucide-react"
 
 import { OpenOrder } from "@/types/order"
 import { useCancelOrder } from "@/hooks/use-cancel-order"
@@ -82,6 +82,23 @@ export function MyOpenOrder() {
 
   const { mutateAsync: cancelOrder, isPending: isCancelling } = useCancelOrder()
 
+  const orders = useMemo(() => {
+    return _.chain(openOrders.data)
+      .map((order) => {
+        const amount = order.collateral.amount.div(order.rate)
+        const price = order.rate.multipliedBy(
+          collateralPrices.data?.[order.collateral.coinType] || 0
+        )
+        return {
+          ...order,
+          amount,
+          price,
+        }
+      })
+      .orderBy(["createdAt"], ["desc"])
+      .value()
+  }, [openOrders.data, collateralPrices.data])
+
   if (!openOrders.data?.length) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-2 opacity-20">
@@ -95,11 +112,7 @@ export function MyOpenOrder() {
     <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
       <ScrollArea className="min-h-0 flex-1">
         <div className="h-full space-y-2">
-          {openOrders.data?.map((order) => {
-            const amount = order.collateral.amount.div(order.rate)
-            const price = order.rate.multipliedBy(
-              collateralPrices.data?.[order.collateral.coinType] || 0
-            )
+          {orders.map((order) => {
             return (
               <div
                 key={order.id}
@@ -124,7 +137,7 @@ export function MyOpenOrder() {
                 <div className="*:odd:text-muted-foreground grid grid-cols-2 gap-1 *:even:flex *:even:items-center *:even:justify-end *:even:gap-2 *:even:text-end *:even:font-semibold">
                   <div>Amount</div>
                   <div>
-                    {amount.toFormat(4)}{" "}
+                    {order.amount.toFormat(4)}{" "}
                     <img src={market.icon} className="size-4 shrink-0" />
                   </div>
                   <div>Collateral</div>
@@ -136,7 +149,7 @@ export function MyOpenOrder() {
                     />
                   </div>
                   <div>Price</div>
-                  <div>${price.toFormat(4)}</div>
+                  <div>${order.price.toFormat(4)}</div>
                 </div>
                 <Button
                   variant="outline"

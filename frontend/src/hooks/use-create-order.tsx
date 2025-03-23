@@ -14,7 +14,7 @@ import { CreateOrder } from "@/types/order"
 import { useNetwork } from "@/components/wallet-provider"
 
 import { triggerUpdateMyOpenOrders } from "./use-my-orders"
-import { triggerUpdateOpenOrders } from "./use-open-orders"
+import { triggerUpdateOpenOrdersEvents } from "./use-order-events"
 import { useSignAndExecute } from "./use-sign-and-execute"
 
 export const useCreateOrder = () => {
@@ -79,7 +79,10 @@ export const useCreateOrder = () => {
         transaction: txb,
       })
 
-      await triggerUpdateOpenOrders(queryClient, createOrderParams.market.id)
+      await triggerUpdateOpenOrdersEvents(
+        queryClient,
+        createOrderParams.market.id
+      )
       await triggerUpdateMyOpenOrders(queryClient, createOrderParams.market.id)
 
       return tx

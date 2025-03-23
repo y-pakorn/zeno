@@ -31,6 +31,7 @@ export const DataTable = memo(function DataTable<TData, TValue>({
   rowProps,
   className,
   isLoadingSkeleton = false,
+  skeletonCount = 10,
   ...props
 }: ComponentProps<"div"> & {
   columns: any
@@ -40,18 +41,19 @@ export const DataTable = memo(function DataTable<TData, TValue>({
   rowProps?: (row: Row<TData>) => React.ComponentProps<"tr">
   options?: Partial<Omit<TableOptions<TData>, "data" | "columns">>
   isLoadingSkeleton?: boolean
+  skeletonCount?: number
 }) {
   const { data: finalData, columns: finalColumns } = useMemo(() => {
     return isLoadingSkeleton
       ? {
-          data: Array.from({ length: 10 }, () => ({})),
+          data: Array.from({ length: skeletonCount }, () => ({})),
           columns: columns.map((column: any) => ({
             ...column,
             cell: () => <Skeleton className="h-4 w-full" />,
           })),
         }
       : { data, columns }
-  }, [columns, data, isLoadingSkeleton])
+  }, [columns, data, isLoadingSkeleton, skeletonCount])
   const table = useReactTable({
     data: finalData as TData[],
     columns: finalColumns,
@@ -94,7 +96,7 @@ export const DataTable = memo(function DataTable<TData, TValue>({
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody>
+        <TableBody className="font-medium">
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow

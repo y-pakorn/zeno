@@ -18,32 +18,11 @@ import {
 } from "@/types/order"
 import { parseOpenOrder } from "@/lib/contract"
 
-export function triggerUpdateOpenOrders(
-  queryClient: QueryClient,
-  marketId: string
-) {
-  return queryClient.invalidateQueries({
-    queryKey: ["open-order-events", marketId],
-  })
-}
-
-export function triggerUpdateCancelledOrders(
-  queryClient: QueryClient,
-  marketId: string
-) {
-  return queryClient.invalidateQueries({
-    queryKey: ["cancelled-orders-events", marketId],
-  })
-}
-
-export function triggerUpdateFilledOrders(
-  queryClient: QueryClient,
-  marketId: string
-) {
-  return queryClient.invalidateQueries({
-    queryKey: ["filled-orders-events", marketId],
-  })
-}
+import {
+  useCancelledOrderEvents,
+  useFilledOrderEvents,
+  useOpenOrderEvents,
+} from "./use-order-events"
 
 export function useOpenOrders({
   market,
@@ -73,81 +52,43 @@ export function useOpenOrders({
   })
 
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now())
-  const _updateDataOpen = useQuery({
-    queryKey: ["open-order-events", market.id],
-    enabled: !!query.data,
-    refetchInterval: 10 * 1000, // 10 seconds
-    queryFn: async () => {
-      const events = await client.queryEvents({
-        query: {
-          MoveEventType: `${market.packageId}::zeno::OrderCreated`,
-        },
-        order: "descending",
-      })
+  const __ = useOpenOrderEvents({
+    market,
+    select: (data) => {
       const prevOrders = queryClient.getQueryData<OpenOrder[]>([
         "open-orders",
         market.id,
       ])
-      if (!prevOrders) return false
+
+      if (!prevOrders) return []
       const ids = new Set(prevOrders?.map((o) => o.id))
       const insertedOrders: OpenOrder[] = []
-      for (const event of events.data) {
-        if (parseInt(event.timestampMs!) < lastUpdated) continue
-        const eventData = event.parsedJson as OpenOrderEvent
-        if (eventData.market_id !== market.marketId) continue
-        if (ids.has(eventData.order_id)) continue
-        const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
-        const collateral = market.collaterals.find(
-          (c) => c.coinType === coinType
+      for (const event of data) {
+        if (ids.has(event.id)) continue
+        if (event.createdAt.getTime() < lastUpdated) continue
+        insertedOrders.push(event)
+      }
+      if (insertedOrders.length > 0) {
+        queryClient.setQueryData<OpenOrder[]>(
+          ["open-orders", market.id],
+          (old) => {
+            return [...(old || []), ...insertedOrders]
+          }
         )
-        if (!collateral) continue
-        const order: OpenOrder = {
-          id: eventData.order_id,
-          by: event.sender,
-          createdAt: new Date(parseInt(event.timestampMs!)),
-          fillType: eventData.can_partially_fill ? "partial" : "full",
-          type: eventData.is_buy ? "buy" : "sell",
-          collateral: {
-            coinType,
-            icon: collateral.icon,
-            ticker: collateral.ticker,
-            exponent: collateral.exponent,
-            amount: new BigNumber(eventData.collateral_amount).shiftedBy(
-              -collateral.exponent
-            ),
-            filledAmount: new BigNumber(0),
-          },
-          rate: new BigNumber(eventData.rate).shiftedBy(-9),
-        }
-        insertedOrders.push(order)
+        setLastUpdated(Date.now())
       }
-      queryClient.setQueryData<OpenOrder[]>(
-        ["open-orders", market.id],
-        (old) => {
-          return [...(old || []), ...insertedOrders]
-        }
-      )
-      setLastUpdated(Date.now())
-      return true
+      return []
     },
   })
 
-  const _updateDataCancelled = useQuery({
-    queryKey: ["cancelled-orders-events", market.id],
+  const ___ = useCancelledOrderEvents({
+    market,
     enabled: !!query.data,
     refetchInterval: 11 * 1000, // 11 seconds
-    queryFn: async () => {
-      const events = await client.queryEvents({
-        query: {
-          MoveEventType: `${market.packageId}::zeno::OrderCancelled`,
-        },
-        order: "descending",
-      })
+    select: (data) => {
       const toRemoveIds: Set<string> = new Set()
-      for (const event of events.data) {
-        const eventData = event.parsedJson as OrderCancelledEvent
-        if (eventData.market_id !== market.marketId) continue
-        toRemoveIds.add(eventData.order_id)
+      for (const event of data) {
+        toRemoveIds.add(event.order_id)
       }
       queryClient.setQueryData<OpenOrder[]>(
         ["open-orders", market.id],
@@ -155,26 +96,16 @@ export function useOpenOrders({
           return old?.filter((o) => !toRemoveIds.has(o.id))
         }
       )
-      return true
+      return []
     },
   })
 
-  const _updateDataFilled = useQuery({
-    queryKey: ["filled-orders-events", market.id],
-    enabled: !!query.data,
-    refetchInterval: 11 * 1000, // 11 seconds
-    queryFn: async () => {
-      const events = await client.queryEvents({
-        query: {
-          MoveEventType: `${market.packageId}::zeno::OrderFilled`,
-        },
-        order: "descending",
-      })
+  const _ = useFilledOrderEvents({
+    market,
+    select: (data) => {
       const toRemoveIds: Set<string> = new Set()
-      for (const event of events.data) {
-        const eventData = event.parsedJson as OrderFilledEvent
-        if (eventData.market_id !== market.marketId) continue
-        toRemoveIds.add(eventData.order_id)
+      for (const event of data) {
+        toRemoveIds.add(event.id)
       }
       queryClient.setQueryData<OpenOrder[]>(
         ["open-orders", market.id],
@@ -182,7 +113,7 @@ export function useOpenOrders({
           return old?.filter((o) => !toRemoveIds.has(o.id))
         }
       )
-      return true
+      return []
     },
   })
 

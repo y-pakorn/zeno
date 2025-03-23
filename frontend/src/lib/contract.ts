@@ -80,7 +80,7 @@ export function parseFilledOrder(
       amount: collateralAmount,
     },
     rate,
-    createdAt: new Date(parseInt(filledOrderData.created_at)),
+    // createdAt: new Date(parseInt(filledOrderData.created_at)),
     filledAt: new Date(parseInt(filledOrderData.filled_at)),
   } satisfies FilledOrder
 }
@@ -111,48 +111,55 @@ export function parseSettledOrder(
   } satisfies SettledOrder
 }
 
-// export function parseOpenOrderEvent(
-//   event: SuiEvent,
-//   market: PreMarket
-// ): OpenOrder {
-//   const eventData = event.parsedJson as OpenOrderEvent
-//   const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
-//   const collateral = market.collaterals.find((c) => c.coinType === coinType)!
-//   return {
-//     id: eventData.order_id,
-//     by: event.sender,
-//     createdAt: new Date(parseInt(event.timestampMs!)),
-//     fillType: eventData.can_partially_fill ? "partial" : "full",
-//     type: eventData.is_buy ? "buy" : "sell",
-//     collateral: {
-//       coinType,
-//       icon: collateral.icon,
-//       ticker: collateral.ticker,
-//       exponent: collateral.exponent,
-//       amount: new BigNumber(eventData.collateral_amount).shiftedBy(
-//         -collateral.exponent
-//       ),
-//       filledAmount: new BigNumber(0),
-//     },
-//     rate: new BigNumber(eventData.rate).shiftedBy(-9),
-//   }
-// }
+export function parseOpenOrderEvent(
+  event: SuiEvent,
+  market: PreMarket
+): OpenOrder {
+  const eventData = event.parsedJson as OpenOrderEvent
+  const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
+  const collateral = market.collaterals.find((c) => c.coinType === coinType)!
+  return {
+    id: eventData.order_id,
+    by: event.sender,
+    createdAt: new Date(parseInt(event.timestampMs!)),
+    fillType: eventData.can_partially_fill ? "partial" : "full",
+    type: eventData.is_buy ? "buy" : "sell",
+    collateral: {
+      coinType,
+      icon: collateral.icon,
+      ticker: collateral.ticker,
+      exponent: collateral.exponent,
+      amount: new BigNumber(eventData.collateral_amount).shiftedBy(
+        -collateral.exponent
+      ),
+      filledAmount: new BigNumber(0),
+    },
+    rate: new BigNumber(eventData.rate).shiftedBy(-9),
+  }
+}
 
-// export function parseFilledOrderEvent(
-//   event: SuiEvent,
-//   market: PreMarket
-// ): FilledOrder {
-//   const eventData = event.parsedJson as OrderFilledEvent
-//   const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
-//   const collateral = market.collaterals.find((c) => c.coinType === coinType)!
-//   return {
-//     id: eventData.order_id,
-//     maker: eventData.,
-//     taker: eventData.taker,
-//     type: eventData.is_buy ? "buy" : "sell",
-//     collateral: {
-//       coinType,
-//       icon: collateral.icon,
-//       ticker: collateral.ticker,
-//   }
-// }
+export function parseFilledOrderEvent(
+  event: SuiEvent,
+  market: PreMarket
+): FilledOrder {
+  const eventData = event.parsedJson as OrderFilledEvent
+  const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
+  const collateral = market.collaterals.find((c) => c.coinType === coinType)!
+  return {
+    id: eventData.order_id,
+    maker: eventData.maker,
+    taker: eventData.taker,
+    type: eventData.is_buy ? "buy" : "sell",
+    filledAt: new Date(parseInt(event.timestampMs!)),
+    collateral: {
+      coinType,
+      icon: collateral.icon,
+      ticker: collateral.ticker,
+      exponent: collateral.exponent,
+      amount: new BigNumber(eventData.collateral_amount).shiftedBy(
+        -collateral.exponent
+      ),
+    },
+    rate: new BigNumber(eventData.rate).shiftedBy(-9),
+  }
+}

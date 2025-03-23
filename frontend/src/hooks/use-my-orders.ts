@@ -70,6 +70,7 @@ export const useMyOrders = ({
       },
     },
     {
+      queryKey: ["order-owner-table-handle", market.id, account?.address],
       enabled: !!onchainMarket?.orderOwnerTableId && !!account,
       select: (data) => {
         const content = data.data?.content as any

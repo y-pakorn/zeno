@@ -6,10 +6,7 @@ import _ from "lodash"
 import { CancelOrder } from "@/types/order"
 
 import { triggerUpdateMyOpenOrders } from "./use-my-orders"
-import {
-  triggerUpdateCancelledOrders,
-  triggerUpdateOpenOrders,
-} from "./use-open-orders"
+import { triggerUpdateCancelledOrdersEvents } from "./use-order-events"
 import { useSignAndExecute } from "./use-sign-and-execute"
 
 export const useCancelOrder = () => {
@@ -39,7 +36,7 @@ export const useCancelOrder = () => {
         transaction: txb,
       })
 
-      await triggerUpdateCancelledOrders(
+      await triggerUpdateCancelledOrdersEvents(
         queryClient,
         cancelOrderParams.market.id
       )
