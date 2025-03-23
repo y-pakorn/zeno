@@ -66,7 +66,6 @@ export const useCreateOrder = () => {
         target: `${createOrderParams.market.packageId}::zeno::create_order`,
         arguments: [
           txb.object(createOrderParams.market.marketId),
-          txb.object(createOrderParams.market.orderOwnerTableId),
           txb.pure.bool(isBuy),
           collateral,
           txb.pure.u64(rate),

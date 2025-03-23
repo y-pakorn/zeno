@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { DataTable } from "@/components/data-table"
 
@@ -56,7 +57,7 @@ export function OfferSection({
   })
 
   return (
-    <div className={cn("space-y-2", className)} {...props}>
+    <div className={cn("flex w-full flex-col gap-2", className)} {...props}>
       <h2 className="font-heading text-2xl font-bold">Offers</h2>
       <div className="flex items-center gap-4">
         <ToggleGroup
@@ -145,7 +146,7 @@ export function OfferSection({
 }
 
 const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
-  const { offers } = useBook()
+  const { offers, openOrders } = useBook()
   const { selectOrder, selectedOrderIds, unselectOrder } = useOrder()
 
   const { buy, sell } = useMemo(() => {
@@ -274,7 +275,7 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
   )
 
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid max-h-full min-h-0 flex-1 grid-cols-2 gap-2">
       <DataTable
         className={cn(
           filters.type !== "buy" ? "col-span-2" : "hidden",
@@ -282,6 +283,7 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
         )}
         columns={columns}
         data={sell}
+        isLoadingSkeleton={openOrders.isFetching || openOrders.isPending}
         transparent
         rowClassName={(row) => {
           const offer = row.original as Offer
@@ -297,6 +299,7 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
         )}
         columns={columns}
         data={buy}
+        isLoadingSkeleton={openOrders.isFetching || openOrders.isPending}
         transparent
         rowClassName={(row) => {
           const offer = row.original as Offer

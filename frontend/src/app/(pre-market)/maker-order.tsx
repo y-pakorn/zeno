@@ -20,10 +20,12 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import { AmountInput } from "./amount-input"
+import { useBook } from "./book-provider"
 import { useMarket } from "./market-provider"
 
 export function MakerOrder() {
-  const { market, collateralPrices, offers } = useMarket()
+  const { market, collateralPrices } = useMarket()
+  const { offers } = useBook()
   const { mutateAsync: createOrder, isPending: isCreatingOrder } =
     useCreateOrder()
 

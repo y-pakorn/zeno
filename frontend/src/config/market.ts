@@ -5,7 +5,6 @@ export const preMarkets: { [key in Network]: PreMarket } = {
   mainnet: {
     id: "mainnet",
     marketId: "",
-    orderOwnerTableId: "",
     packageId:
       "0x3f8ebc08a80d8582382bc5dacd9c572b69ea6962bca4720c8cff808543388cf9",
     name: "Walrus",
@@ -50,11 +49,9 @@ export const preMarkets: { [key in Network]: PreMarket } = {
   devnet: {
     id: "devnet",
     packageId:
-      "0x73571d4383a118e1190373bc5c193a428eaca5d3d07a1f612bf171918b58b8a3",
-    orderOwnerTableId:
-      "0x50d137b2b8d69d875fd8cb8db69ea186bb4e0a10e52ca1a3d9cb4b17389a6ca2",
+      "0xa2ac3ad631f63c99a21f7f818648d67e864e74c7abe9ea5a04b2240950fb816d",
     marketId:
-      "0x98df2875040e034c88572c65ebc7fc8e94946dcf220b25804bdf2ccb4e12fdde",
+      "0x6092b7e6440378b9c3717a446ea91efa27d4729bb88ab21fce245bced31fc005",
     name: "Walrus",
     ticker: "WAL",
     icon: "https://img.cryptorank.io/coins/walrus1727864479768.png",

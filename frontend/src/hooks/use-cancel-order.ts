@@ -27,7 +27,6 @@ export const useCancelOrder = () => {
         target: `${cancelOrderParams.market.packageId}::zeno::cancel_order`,
         arguments: [
           txb.object(cancelOrderParams.market.marketId),
-          txb.object(cancelOrderParams.market.orderOwnerTableId),
           txb.pure.id(cancelOrderParams.orderId),
           txb.object("0x6"),
         ],

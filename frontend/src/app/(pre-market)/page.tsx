@@ -8,6 +8,7 @@ import { MarketHeader } from "./market-header"
 import { OfferSection } from "./offer-section"
 import { OrderProvider } from "./order-provider"
 import { OrderSection } from "./order-section"
+import { RecentTransactionSection } from "./recent-transaction-section"
 
 export default function Home() {
   return (
@@ -22,9 +23,10 @@ export default function Home() {
         >
           <MarketHeader />
           <div className="flex h-[730px] gap-4">
-            <OfferSection className="w-full" />
+            <OfferSection />
             <OrderSection />
           </div>
+          <RecentTransactionSection />
         </div>
       </OrderProvider>
     </BookProvider>

@@ -75,6 +75,9 @@ public struct SettledOrder<phantom C> has key, store {
 public struct Collateral has copy, drop, store {
     coin_type: TypeName,
     minimum_amount: u64,
+    volume_opened: u64,
+    volume_filled: u64,
+    volume_cancelled: u64,
 }
 
 /// Represents a premarket for a specific coin
@@ -93,11 +96,17 @@ public struct PreMarket has key, store {
     orders: Bag,
     filled_orders: Bag,
     settled_orders: Bag,
+    stats: Stats,
+    order_owner_table: Table<address, OrderOwnerCap>,
 }
 
-public struct OrderOwnerTable has key, store {
-    id: UID,
-    owners: Table<address, OrderOwnerCap>,
+public struct Stats has copy, drop, store {
+    order_opened: u64,
+    order_filled: u64,
+    order_settled: u64,
+    order_claimed: u64,
+    order_cancelled: u64,
+    order_closed: u64,
 }
 
 /// Resolution information when the premarket is resolved
@@ -151,6 +160,8 @@ public struct OrderFilled has copy, drop, store {
     maker_collateral_amount_left: u64,
     collateral_amount: u64,
     collateral_type: TypeName,
+    maker: address,
+    taker: address,
 }
 
 public struct OrderCancelled has copy, drop, store {
@@ -182,13 +193,6 @@ fun init(ctx: &mut TxContext) {
     };
 
     transfer::transfer(admin_cap, ctx.sender());
-
-    let order_owner_table = OrderOwnerTable {
-        id: object::new(ctx),
-        owners: table::new(ctx),
-    };
-
-    transfer::share_object(order_owner_table);
 }
 
 // --- FUNCTIONS ---
@@ -219,6 +223,15 @@ public fun create_premarket(
         orders: bag::new(ctx),
         filled_orders: bag::new(ctx),
         settled_orders: bag::new(ctx),
+        stats: Stats {
+            order_opened: 0,
+            order_filled: 0,
+            order_settled: 0,
+            order_claimed: 0,
+            order_cancelled: 0,
+            order_closed: 0,
+        },
+        order_owner_table: table::new(ctx),
     };
 
     event::emit(PremarketCreated {
@@ -305,6 +318,9 @@ public fun set_collateral_type<T>(
     let collateral = Collateral {
         coin_type,
         minimum_amount,
+        volume_opened: 0,
+        volume_filled: 0,
+        volume_cancelled: 0,
     };
 
     vec_map::insert(&mut market.collateral_types, coin_type, collateral);
@@ -338,7 +354,6 @@ public fun set_resolution<C>(
 
 public fun create_order<T>(
     market: &mut PreMarket,
-    order_owner_table: &mut OrderOwnerTable,
     is_buy: bool,
     collateral: Coin<T>,
     rate: u64,
@@ -357,13 +372,14 @@ public fun create_order<T>(
 
     // check collateral type
     let collateral_type = type_name::get<T>();
-    let collateral_type_info = vec_map::try_get(&market.collateral_types, &collateral_type);
-    assert!(collateral_type_info.is_some(), E_INVALID_COLLATERAL_TYPE);
+    assert!(market.collateral_types.contains(&collateral_type), E_INVALID_COLLATERAL_TYPE);
+    let collateral_type_info = market.collateral_types.get_mut(&collateral_type);
     // check collateral amount
-    assert!(
-        collateral_type_info.borrow().minimum_amount <= collateral.value(),
-        E_INSUFFICIENT_COLLATERAL,
-    );
+    assert!(collateral_type_info.minimum_amount <= collateral.value(), E_INSUFFICIENT_COLLATERAL);
+    // add to volume opened
+    collateral_type_info.volume_opened = collateral_type_info.volume_opened + collateral.value();
+    // add to total order opened
+    market.stats.order_opened = market.stats.order_opened + 1;
 
     let order_id = object::new(ctx);
 
@@ -390,9 +406,9 @@ public fun create_order<T>(
         by: ctx.sender(),
     };
 
-    register_order_owner(&mut order_owner_table.owners, ctx.sender(), ctx);
+    register_order_owner(&mut market.order_owner_table, ctx.sender(), ctx);
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         object::id(&order),
         ModifyOrderType::Order,
         true,
@@ -405,7 +421,6 @@ public fun create_order<T>(
 
 public fun cancel_order<T>(
     premarket: &mut PreMarket,
-    order_owner_table: &mut OrderOwnerTable,
     order_id: ID,
     clock: &Clock,
     ctx: &mut TxContext,
@@ -418,13 +433,21 @@ public fun cancel_order<T>(
     // check order id
     assert!(id.as_inner() == order_id, E_INVALID_ORDER_OWNER);
 
+    // add to total order cancelled
+    premarket.stats.order_cancelled = premarket.stats.order_cancelled + 1;
+    // add to volume cancelled
+    let collateral_type = type_name::get<T>();
+    let collateral_type_info = premarket.collateral_types.get_mut(&collateral_type);
+    collateral_type_info.volume_cancelled =
+        collateral_type_info.volume_cancelled + collateral.value();
+
     event::emit(OrderCancelled {
         market_id: object::id(premarket),
         order_id,
     });
 
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut premarket.order_owner_table,
         order_id,
         ModifyOrderType::Order,
         false,
@@ -450,7 +473,6 @@ public fun cancel_order<T>(
 
 public fun fill_order<T>(
     market: &mut PreMarket,
-    order_owner_table: &mut OrderOwnerTable,
     order_id: ID,
     collateral: Coin<T>,
     clock: &Clock,
@@ -478,6 +500,13 @@ public fun fill_order<T>(
         order.filled_collateral = order.filled_collateral + collateral.value();
     };
 
+    // add to total order filled
+    market.stats.order_filled = market.stats.order_filled + 1;
+    // add to volume filled
+    let collateral_type = type_name::get<T>();
+    let collateral_type_info = market.collateral_types.get_mut(&collateral_type);
+    collateral_type_info.volume_filled = collateral_type_info.volume_filled + collateral.value();
+
     let filled_order_id = object::new(ctx);
 
     event::emit(OrderFilled {
@@ -488,6 +517,8 @@ public fun fill_order<T>(
         maker_collateral_amount_left: amount_left,
         collateral_amount: collateral.value(),
         collateral_type: type_name::get<T>(),
+        maker: order.by,
+        taker: ctx.sender(),
     });
 
     let filled_order = FilledOrder<T> {
@@ -503,9 +534,9 @@ public fun fill_order<T>(
         filled_at: clock.timestamp_ms(),
     };
 
-    register_order_owner(&mut order_owner_table.owners, ctx.sender(), ctx);
+    register_order_owner(&mut market.order_owner_table, ctx.sender(), ctx);
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         object::id(&filled_order),
         ModifyOrderType::FilledOrder,
         true,
@@ -513,7 +544,7 @@ public fun fill_order<T>(
         ctx,
     );
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         object::id(&filled_order),
         ModifyOrderType::FilledOrder,
         true,
@@ -525,7 +556,7 @@ public fun fill_order<T>(
 
     if (will_delete_order) {
         modify_order_owner(
-            &mut order_owner_table.owners,
+            &mut market.order_owner_table,
             order_id,
             ModifyOrderType::Order,
             false,
@@ -541,7 +572,6 @@ public fun fill_order<T>(
 
 public fun settle_order<T, C>(
     market: &mut PreMarket,
-    order_owner_table: &mut OrderOwnerTable,
     filled_order_id: ID,
     final_coin: Coin<C>,
     clock: &Clock,
@@ -586,6 +616,9 @@ public fun settle_order<T, C>(
     let final_coin_correct_balance = final_coin_correct_balance as u64;
     assert!(final_coin.value() >= final_coin_correct_balance, E_INVALID_FINAL_COIN_AMOUNT);
 
+    // add to total order settled
+    market.stats.order_settled = market.stats.order_settled + 1;
+
     // create settled order for buyer to claim the coin later
     let settled_order = SettledOrder<C> {
         id: object::new(ctx),
@@ -606,7 +639,7 @@ public fun settle_order<T, C>(
     // remove filled order from order owner table
     // add settled order for buyer to claim the coin later
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         filled_order_id,
         ModifyOrderType::FilledOrder,
         false,
@@ -614,7 +647,7 @@ public fun settle_order<T, C>(
         ctx,
     );
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         filled_order_id,
         ModifyOrderType::FilledOrder,
         false,
@@ -622,7 +655,7 @@ public fun settle_order<T, C>(
         ctx,
     );
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         filled_order_id,
         ModifyOrderType::SettledOrder,
         true,
@@ -644,7 +677,6 @@ public fun settle_order<T, C>(
 
 public fun claim_order<C>(
     market: &mut PreMarket,
-    order_owner_table: &mut OrderOwnerTable,
     settled_order_id: ID,
     ctx: &mut TxContext,
 ): Coin<C> {
@@ -658,6 +690,9 @@ public fun claim_order<C>(
     // check if claimer is the one who should claim the order
     assert!(claimer == ctx.sender(), E_INVALID_CLAIMER);
 
+    // add to total order claimed
+    market.stats.order_claimed = market.stats.order_claimed + 1;
+
     event::emit(OrderClaimed {
         market_id: object::id(market),
         settled_order_id,
@@ -665,7 +700,7 @@ public fun claim_order<C>(
 
     // remove settled order from order owner table
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         settled_order_id,
         ModifyOrderType::SettledOrder,
         false,
@@ -683,7 +718,6 @@ public fun claim_order<C>(
 
 public fun close_order<T>(
     market: &mut PreMarket,
-    order_owner_table: &mut OrderOwnerTable,
     filled_order_id: ID,
     clock: &Clock,
     ctx: &mut TxContext,
@@ -692,6 +726,9 @@ public fun close_order<T>(
     assert!(market.resolution.is_some(), E_MARKET_NOT_RESOLVED);
     let resolution = market.resolution.borrow();
     assert!(clock.timestamp_ms() > resolution.delivery_before, E_MARKET_DELIVERY_TIME_NOT_PAST);
+
+    // add to total order closed
+    market.stats.order_closed = market.stats.order_closed + 1;
 
     let FilledOrder<T> {
         id,
@@ -718,7 +755,7 @@ public fun close_order<T>(
 
     // remove filled order from order owner table
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         filled_order_id,
         ModifyOrderType::FilledOrder,
         false,
@@ -726,7 +763,7 @@ public fun close_order<T>(
         ctx,
     );
     modify_order_owner(
-        &mut order_owner_table.owners,
+        &mut market.order_owner_table,
         filled_order_id,
         ModifyOrderType::FilledOrder,
         false,

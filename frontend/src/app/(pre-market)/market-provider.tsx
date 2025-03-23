@@ -55,14 +55,12 @@ export const MarketProvider = ({ children }: { children: React.ReactNode }) => {
   const volumeTotal = 109420
 
   const onchainMarket = useOnchainMarket({
-    marketId: market.marketId,
+    market,
   })
 
   const myOrders = useMyOrders({
     market,
-    ordersBagId: onchainMarket.data?.openOrdersBagId!,
-    filledOrdersBagId: onchainMarket.data?.filledOrdersBagId!,
-    settledOrdersBagId: onchainMarket.data?.settledOrdersBagId!,
+    onchainMarket: onchainMarket.data,
   })
 
   const collateralPrices = useCollateralPrices({

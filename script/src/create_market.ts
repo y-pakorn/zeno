@@ -50,7 +50,7 @@ import { Transaction } from "@mysten/sui/transactions";
     receipt.objectChanges!.find(
       (c) =>
         c.type === "created" &&
-        c.objectType === `${contract.packageId}::zeno::PreMarket`
+        c.objectType === `${contract.packageId}::zeno::PreMarket`,
     ) as any
   ).objectId as string;
 

@@ -1,7 +1,14 @@
+import { SuiEvent } from "@mysten/sui/client"
 import BigNumber from "bignumber.js"
 
-import { Collateral } from "@/types/market"
-import { FilledOrder, OpenOrder, SettledOrder } from "@/types/order"
+import { Collateral, PreMarket } from "@/types/market"
+import {
+  FilledOrder,
+  OpenOrder,
+  OpenOrderEvent,
+  OrderFilledEvent,
+  SettledOrder,
+} from "@/types/order"
 
 export function parseOpenOrder(
   object: any,
@@ -103,3 +110,49 @@ export function parseSettledOrder(
     settledAt: new Date(parseInt(settledOrderData.settled_at)),
   } satisfies SettledOrder
 }
+
+// export function parseOpenOrderEvent(
+//   event: SuiEvent,
+//   market: PreMarket
+// ): OpenOrder {
+//   const eventData = event.parsedJson as OpenOrderEvent
+//   const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
+//   const collateral = market.collaterals.find((c) => c.coinType === coinType)!
+//   return {
+//     id: eventData.order_id,
+//     by: event.sender,
+//     createdAt: new Date(parseInt(event.timestampMs!)),
+//     fillType: eventData.can_partially_fill ? "partial" : "full",
+//     type: eventData.is_buy ? "buy" : "sell",
+//     collateral: {
+//       coinType,
+//       icon: collateral.icon,
+//       ticker: collateral.ticker,
+//       exponent: collateral.exponent,
+//       amount: new BigNumber(eventData.collateral_amount).shiftedBy(
+//         -collateral.exponent
+//       ),
+//       filledAmount: new BigNumber(0),
+//     },
+//     rate: new BigNumber(eventData.rate).shiftedBy(-9),
+//   }
+// }
+
+// export function parseFilledOrderEvent(
+//   event: SuiEvent,
+//   market: PreMarket
+// ): FilledOrder {
+//   const eventData = event.parsedJson as OrderFilledEvent
+//   const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
+//   const collateral = market.collaterals.find((c) => c.coinType === coinType)!
+//   return {
+//     id: eventData.order_id,
+//     maker: eventData.,
+//     taker: eventData.taker,
+//     type: eventData.is_buy ? "buy" : "sell",
+//     collateral: {
+//       coinType,
+//       icon: collateral.icon,
+//       ticker: collateral.ticker,
+//   }
+// }

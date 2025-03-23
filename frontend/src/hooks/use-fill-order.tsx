@@ -61,7 +61,6 @@ export const useFillOrder = () => {
           target: `${fillOrderParams.market.packageId}::zeno::fill_order`,
           arguments: [
             txb.object(fillOrderParams.market.marketId),
-            txb.object(fillOrderParams.market.orderOwnerTableId),
             txb.pure.id(order.orderId),
             collateral,
             txb.object("0x6"),

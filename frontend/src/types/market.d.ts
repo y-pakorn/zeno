@@ -1,8 +1,9 @@
+import BigNumber from "bignumber.js"
+
 export type PreMarket = {
   id: string
   marketId: string
   packageId: string
-  orderOwnerTableId: string
   name: string
   ticker: string
   icon: string
@@ -50,4 +51,21 @@ export type OnchainMarket = {
   totalFilledOrders: number
   settledOrdersBagId: string
   totalSettledOrders: number
+  orderOwnerTableId: string
+  collateral: Record<
+    string,
+    {
+      volumeCancelled: BigNumber
+      volumeFilled: BigNumber
+      volumeOpened: BigNumber
+    }
+  >
+  stats: {
+    cancelled: number
+    filled: number
+    settled: number
+    opened: number
+    claimed: number
+    closed: number
+  }
 }

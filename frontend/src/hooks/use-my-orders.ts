@@ -10,7 +10,7 @@ import {
   UseQueryResult,
 } from "@tanstack/react-query"
 
-import { PreMarket } from "@/types/market"
+import { OnchainMarket, PreMarket } from "@/types/market"
 import { FilledOrder, OpenOrder, SettledOrder } from "@/types/order"
 import {
   parseFilledOrder,
@@ -53,43 +53,24 @@ export type MyOrders = {
 
 export const useMyOrders = ({
   market,
-  ordersBagId,
-  filledOrdersBagId,
-  settledOrdersBagId,
+  onchainMarket,
 }: {
   market: PreMarket
-  ordersBagId: string
-  filledOrdersBagId: string
-  settledOrdersBagId: string
+  onchainMarket?: OnchainMarket
 }): MyOrders => {
   const account = useCurrentAccount()
 
-  const tableHandle = useSuiClientQuery(
-    "getObject",
-    {
-      id: market.orderOwnerTableId,
-      options: {
-        showContent: true,
-      },
-    },
-    {
-      select: (data) => {
-        const content = data.data?.content as any
-        return content.fields.owners.fields.id.id as string
-      },
-    }
-  )
   const orderOwnerTableHandle = useSuiClientQuery(
     "getDynamicFieldObject",
     {
-      parentId: tableHandle.data!,
+      parentId: onchainMarket?.orderOwnerTableId!,
       name: {
         type: "address",
         value: account?.address,
       },
     },
     {
-      enabled: !!tableHandle.data && !!account,
+      enabled: !!onchainMarket?.orderOwnerTableId && !!account,
       select: (data) => {
         const content = data.data?.content as any
         const orderHandle = content.fields.value.fields.order_ids.fields.id
@@ -112,7 +93,9 @@ export const useMyOrders = ({
   const orders = useQuery({
     queryKey: ["my-open-orders", market.id, account?.address],
     enabled:
-      !!orderOwnerTableHandle.data?.orderHandle && !!ordersBagId && !!account,
+      !!orderOwnerTableHandle.data?.orderHandle &&
+      !!onchainMarket?.openOrdersBagId &&
+      !!account,
     queryFn: async () => {
       const orderIds = await client.getDynamicFields({
         parentId: orderOwnerTableHandle.data!.orderHandle,
@@ -122,7 +105,7 @@ export const useMyOrders = ({
         orderIds.data.map(async (o) => {
           const orderId = o.name.value as string
           const order = await client.getDynamicFieldObject({
-            parentId: ordersBagId,
+            parentId: onchainMarket!.openOrdersBagId,
             name: {
               type: "0x2::object::ID",
               value: orderId,
@@ -139,7 +122,7 @@ export const useMyOrders = ({
     queryKey: ["my-filled-orders", market.id, account?.address],
     enabled:
       !!orderOwnerTableHandle.data?.filledOrderHandle &&
-      !!filledOrdersBagId &&
+      !!onchainMarket?.filledOrdersBagId &&
       !!account,
     queryFn: async () => {
       const filledOrderIds = await client.getDynamicFields({
@@ -150,7 +133,7 @@ export const useMyOrders = ({
         filledOrderIds.data.map(async (o) => {
           const filledOrderId = o.name.value as string
           const filledOrder = await client.getDynamicFieldObject({
-            parentId: filledOrdersBagId,
+            parentId: onchainMarket!.filledOrdersBagId,
             name: {
               type: "0x2::object::ID",
               value: filledOrderId,
@@ -167,7 +150,7 @@ export const useMyOrders = ({
     queryKey: ["my-settled-orders", market.id, account?.address],
     enabled:
       !!orderOwnerTableHandle.data?.settledOrderHandle &&
-      !!settledOrdersBagId &&
+      !!onchainMarket?.settledOrdersBagId &&
       !!account,
     queryFn: async () => {
       const settledOrderIds = await client.getDynamicFields({
@@ -178,7 +161,7 @@ export const useMyOrders = ({
         settledOrderIds.data.map(async (o) => {
           const settledOrderId = o.name.value as string
           const settledOrder = await client.getDynamicFieldObject({
-            parentId: settledOrdersBagId,
+            parentId: onchainMarket!.settledOrdersBagId,
             name: {
               type: "0x2::object::ID",
               value: settledOrderId,
