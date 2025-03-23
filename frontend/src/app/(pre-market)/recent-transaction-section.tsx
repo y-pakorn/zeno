@@ -11,7 +11,7 @@ import { formatAddress } from "@/lib/utils"
 import { useFilledOrderEvents } from "@/hooks/use-order-events"
 import { Badge } from "@/components/ui/badge"
 import { DataTable } from "@/components/data-table"
-import { networkConfig, useNetwork } from "@/components/wallet-provider"
+import { useNetwork } from "@/components/wallet-provider"
 
 import { useMarket } from "./market-provider"
 

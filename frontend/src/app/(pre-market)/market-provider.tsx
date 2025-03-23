@@ -19,10 +19,6 @@ import { useNetwork } from "@/components/wallet-provider"
 
 export type MarketProviderContextType = {
   market: PreMarket
-  price: number
-  change24h: number
-  volume24h: number
-  volumeTotal: number
   onchainMarket: UseQueryResult<OnchainMarket>
   collateralPrices: UseQueryResult<Record<string, BigNumber>>
   myOrders: MyOrders
@@ -71,10 +67,6 @@ export const MarketProvider = ({ children }: { children: React.ReactNode }) => {
     <MarketProviderContext.Provider
       value={{
         market,
-        price,
-        change24h,
-        volume24h,
-        volumeTotal,
         onchainMarket,
         collateralPrices,
         myOrders,
