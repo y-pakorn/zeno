@@ -452,7 +452,7 @@ public fun fill_order<T>(
     market: &mut PreMarket,
     order_owner_table: &mut OrderOwnerTable,
     order_id: ID,
-    collateral: Balance<T>,
+    collateral: Coin<T>,
     clock: &Clock,
     ctx: &mut TxContext,
 ) {
@@ -475,13 +475,14 @@ public fun fill_order<T>(
     if (!will_delete_order) {
         // ensure that amount left is more than minimum fill amount
         assert!(amount_left >= minimum_fill_amount, E_AMOUNT_LEFT_NOT_ENOUGH);
+        order.filled_collateral = order.filled_collateral + collateral.value();
     };
 
     let filled_order_id = object::new(ctx);
 
     event::emit(OrderFilled {
         market_id,
-        order_id: *filled_order_id.as_inner(),
+        order_id,
         filled_order_id: *filled_order_id.as_inner(),
         rate: order.rate,
         maker_collateral_amount_left: amount_left,
@@ -496,7 +497,7 @@ public fun fill_order<T>(
         maker: order.by,
         taker: ctx.sender(),
         maker_collateral: order.collateral.split(collateral.value()),
-        taker_collateral: collateral,
+        taker_collateral: collateral.into_balance(),
         rate: order.rate,
         created_at: order.created_at,
         filled_at: clock.timestamp_ms(),
