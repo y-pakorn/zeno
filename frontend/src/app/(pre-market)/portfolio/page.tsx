@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo } from "react"
+import { memo, useMemo } from "react"
 import { useCurrentAccount } from "@mysten/dapp-kit"
+import { WalletAccount } from "@mysten/wallet-standard"
 import _ from "lodash"
 import { Wallet } from "lucide-react"
 import { match } from "ts-pattern"
@@ -18,10 +19,14 @@ export default function PortfolioPage() {
     return <EmptyState icon={Wallet} header="Please connect your wallet" />
   }
 
-  return <Portfolio />
+  return <Portfolio account={account} />
 }
 
-function Portfolio() {
+const Portfolio = memo(function Portfolio({
+  account,
+}: {
+  account: WalletAccount
+}) {
   const { myOrders } = useMarket()
   const orders = useMemo(() => {
     return _.chain(
@@ -57,7 +62,8 @@ function Portfolio() {
   ])
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-2 py-4">
+      <h1 className="text-2xl font-bold">Activity</h1>
       <div className="grid gap-2 md:grid-cols-3 xl:grid-cols-4">
         {orders.map((order) => (
           <OrderCard key={order.order.id} {...order} />
@@ -65,4 +71,4 @@ function Portfolio() {
       </div>
     </div>
   )
-}
+})
