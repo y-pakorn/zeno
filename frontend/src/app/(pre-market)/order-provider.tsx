@@ -2,9 +2,11 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react"
+import { useCurrentAccount } from "@mysten/dapp-kit"
 import { useMutation, UseMutationResult } from "@tanstack/react-query"
 import BigNumber from "bignumber.js"
 import _ from "lodash"
@@ -51,9 +53,15 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const { market, collateralPrices } = useMarket()
   const { openOrders } = useBook()
 
+  const account = useCurrentAccount()
+
   const [selectedOrderIds, setSelectedOrderIds] = useState<
     OrderContextType["selectedOrderIds"]
   >(new Set())
+
+  useEffect(() => {
+    setSelectedOrderIds(new Set())
+  }, [account])
 
   const selected = useMemo(() => {
     if (!openOrders.data) return

@@ -93,6 +93,12 @@ export function TakerOrder() {
       {match({
         connected: !!address,
         selected,
+        isInsufficientBalance:
+          balance.data?.totalBalance &&
+          selected?.exponent &&
+          new BigNumber(balance.data.totalBalance)
+            .shiftedBy(-selected.exponent)
+            .lt(selected.totalCollateralAmount),
       })
         .with(
           P.union(
@@ -114,6 +120,25 @@ export function TakerOrder() {
                 rounded="full"
               >
                 {connected ? "Select Order First" : "Please Connect Wallet"}
+              </Button>
+            )
+          }
+        )
+        .with(
+          {
+            connected: true,
+            isInsufficientBalance: true,
+          },
+          () => {
+            return (
+              <Button
+                variant="destructive"
+                disabled
+                size="lg"
+                className="w-full"
+                rounded="full"
+              >
+                Insufficient Balance
               </Button>
             )
           }
@@ -151,12 +176,12 @@ export function TakerOrder() {
             collateral.
           </div>
           <div className="*:odd:text-muted-foreground grid w-full grid-cols-2 gap-y-1 text-xs font-medium *:even:text-end">
-            <div>Avg Price Per Token</div>
+            <div>Avg Token Per Collateral</div>
             <div className="inline-flex items-center justify-end gap-1">
               {selected.averagePrice.toFormat(4)}{" "}
               <img
-                src={selected.icon}
-                alt={selected.ticker}
+                src={market.icon}
+                alt={market.ticker}
                 className="size-4 rounded-full"
               />
             </div>

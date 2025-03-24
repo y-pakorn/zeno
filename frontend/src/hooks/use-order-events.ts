@@ -11,7 +11,7 @@ export function useOpenOrderEvents({
 }: { market: PreMarket } & Partial<UseQueryOptions<OpenOrder[]>>) {
   const client = useSuiClient()
   return useQuery({
-    queryKey: ["open-order-events", market.id],
+    queryKey: ["open-orders-events", market.id],
     queryFn: async () => {
       const events = await client.queryEvents({
         query: {
@@ -31,7 +31,7 @@ export function useFilledOrderEvents({
 }: { market: PreMarket } & Partial<UseQueryOptions<FilledOrder[]>>) {
   const client = useSuiClient()
   return useQuery({
-    queryKey: ["filled-order-events", market.id],
+    queryKey: ["filled-orders-events", market.id],
     queryFn: async () => {
       const events = await client.queryEvents({
         query: {
@@ -51,7 +51,7 @@ export function useCancelledOrderEvents({
 }: { market: PreMarket } & Partial<UseQueryOptions<OrderCancelledEvent[]>>) {
   const client = useSuiClient()
   return useQuery({
-    queryKey: ["cancelled-order-events", market.id],
+    queryKey: ["cancelled-orders-events", market.id],
     queryFn: async () => {
       const events = await client.queryEvents({
         query: {
@@ -72,7 +72,7 @@ export function triggerUpdateOpenOrdersEvents(
   marketId: string
 ) {
   return queryClient.invalidateQueries({
-    queryKey: ["open-order-events", marketId],
+    queryKey: ["open-orders-events", marketId],
   })
 }
 

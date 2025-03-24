@@ -54,6 +54,8 @@ export function useOpenOrders({
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now())
   const __ = useOpenOrderEvents({
     market,
+    enabled: !!query.data,
+    refetchInterval: 11 * 1000, // 11 seconds
     select: (data) => {
       const prevOrders = queryClient.getQueryData<OpenOrder[]>([
         "open-orders",
@@ -102,6 +104,8 @@ export function useOpenOrders({
 
   const _ = useFilledOrderEvents({
     market,
+    enabled: !!query.data,
+    refetchInterval: 11 * 1000, // 11 seconds
     select: (data) => {
       const toRemoveIds: Set<string> = new Set()
       for (const event of data) {
