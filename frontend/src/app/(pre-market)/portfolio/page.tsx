@@ -58,7 +58,7 @@ function Portfolio() {
 
   return (
     <div className="space-y-4 py-4">
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid gap-2 md:grid-cols-3 xl:grid-cols-4">
         {orders.map((order) => (
           <OrderCard key={order.order.id} {...order} />
         ))}

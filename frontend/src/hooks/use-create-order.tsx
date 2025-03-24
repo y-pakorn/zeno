@@ -54,12 +54,17 @@ export const useCreateOrder = () => {
               const found = coins.data.find(
                 (c) => BigInt(c.balance) >= BigInt(amount)
               )
-              if (found) return txb.object(found.coinObjectId)
+              if (found)
+                return txb.splitCoins(found.coinObjectId, [
+                  txb.pure.u64(amount),
+                ])
               txb.mergeCoins(
                 coins.data[0].coinObjectId,
                 coins.data.slice(1).map((c) => c.coinObjectId)
               )
-              return txb.object(coins.data[0].coinObjectId)
+              return txb.splitCoins(txb.object(coins.data[0].coinObjectId), [
+                txb.pure.u64(amount),
+              ])
             })()
 
       txb.moveCall({

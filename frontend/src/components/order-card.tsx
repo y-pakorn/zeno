@@ -1,4 +1,5 @@
 import { ComponentProps, memo, useMemo, useState } from "react"
+import { useCurrentAccount } from "@mysten/dapp-kit"
 import dayjs from "dayjs"
 import _ from "lodash"
 import { Loader2 } from "lucide-react"
@@ -6,6 +7,9 @@ import { match, P } from "ts-pattern"
 
 import { FilledOrder, OpenOrder, SettledOrder } from "@/types/order"
 import { useCancelOrder } from "@/hooks/use-cancel-order"
+import { useClaimOrder } from "@/hooks/use-claim-order"
+import { useCloseOrder } from "@/hooks/use-close-order"
+import { useSettleOrder } from "@/hooks/use-settle-order"
 import { useMarket } from "@/app/(pre-market)/market-provider"
 
 import { Badge } from "./ui/badge"
@@ -240,9 +244,64 @@ export const FilledOrderButton = memo(function FilledOrderButton({
 }: {
   order: FilledOrder
 } & ComponentProps<typeof Button>) {
+  const account = useCurrentAccount()
+  const { market } = useMarket()
+
+  const { mutateAsync: settleOrder, isPending: isSettling } = useSettleOrder()
+  const { mutateAsync: closeOrder, isPending: isClosing } = useCloseOrder()
+
   return (
-    <Button variant="outline" className="w-full" rounded="full" {...props}>
-      View
+    <Button
+      variant="outline"
+      className="w-full"
+      rounded="full"
+      {...props}
+      disabled={
+        !market.resolution ||
+        new Date() > market.resolution.deliveryBefore ||
+        new Date() < market.resolution.settlementStart ||
+        isSettling ||
+        isClosing
+      }
+      onClick={async () => {
+        if (
+          (account!.address === order.maker && order.type === "sell") ||
+          (account!.address === order.taker && order.type === "buy")
+        ) {
+          await settleOrder({
+            market,
+            filledOrderId: order.id,
+            finalCoin: order.collateral,
+            collateralCoinType: order.collateral.coinType,
+          })
+        } else {
+          await closeOrder({
+            market,
+            filledOrderId: order.id,
+          })
+        }
+      }}
+    >
+      {!market.resolution ? (
+        "Settle in TBA"
+      ) : new Date() < market.resolution.settlementStart ? (
+        `Settle in ${dayjs(market.resolution.settlementStart).fromNow()}`
+      ) : new Date() < market.resolution.deliveryBefore ? (
+        (account!.address === order.maker && order.type === "sell") ||
+        (account!.address === order.taker && order.type === "buy") ? (
+          <>
+            Settle and claim {order.collateral.amount.toFormat(4)}{" "}
+            <img src={order.collateral.icon} className="size-4 shrink-0" />
+          </>
+        ) : (
+          `Wait for settlement in ${dayjs(market.resolution.deliveryBefore).fromNow()}`
+        )
+      ) : (
+        <>
+          Close and claim {order.collateral.amount.toFormat(4)}{" "}
+          <img src={order.collateral.icon} className="size-4 shrink-0" />
+        </>
+      )}
     </Button>
   )
 })
@@ -253,9 +312,24 @@ export const SettledOrderButton = memo(function SettledOrderButton({
 }: {
   order: SettledOrder
 }) {
+  const { market } = useMarket()
+  const { mutateAsync: claimOrder, isPending: isClaiming } = useClaimOrder()
   return (
-    <Button variant="outline" className="w-full" rounded="full" {...props}>
-      Claim
+    <Button
+      variant="outline"
+      className="w-full"
+      rounded="full"
+      {...props}
+      disabled={isClaiming}
+      onClick={async () => {
+        await claimOrder({
+          market,
+          settledOrderId: order.id,
+        })
+      }}
+    >
+      Claim {order.balance.amount.toFormat(4)}{" "}
+      <img src={order.balance.icon} className="size-4 shrink-0" />
     </Button>
   )
 })

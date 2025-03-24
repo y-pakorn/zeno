@@ -1,5 +1,7 @@
 import BigNumber from "bignumber.js"
 
+import { PreMarket } from "./market"
+
 export type Order = {
   id: string
   createdAt: string
@@ -61,7 +63,7 @@ export type Offer = OpenOrder & {
 }
 
 export type CreateOrder = {
-  market: Market
+  market: PreMarket
   type: "buy" | "sell"
   fillType?: "partial" | "full"
   rate: BigNumber
@@ -73,7 +75,7 @@ export type CreateOrder = {
 }
 
 export type FillOrder = {
-  market: Market
+  market: PreMarket
   orders: {
     orderId: string
     collateral: {
@@ -85,9 +87,30 @@ export type FillOrder = {
 }
 
 export type CancelOrder = {
-  market: Market
+  market: PreMarket
   orderId: string
   coinType: string
+}
+
+export type SettleOrder = {
+  market: PreMarket
+  filledOrderId: string
+  collateralCoinType: string
+  finalCoin: {
+    coinType: string
+    amount: BigNumber
+    exponent?: number
+  }
+}
+
+export type ClaimOrder = {
+  market: PreMarket
+  settledOrderId: string
+}
+
+export type CloseOrder = {
+  market: PreMarket
+  filledOrderId: string
 }
 
 export type OpenOrderEvent = {
