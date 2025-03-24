@@ -55,7 +55,6 @@ const items = [
         label: "Portfolio",
         icon: PieChart,
         href: "/portfolio",
-        disabled: true,
       },
     ],
   },

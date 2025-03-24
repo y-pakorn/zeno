@@ -275,6 +275,7 @@ export function MakerOrder() {
       </div>
       <Button
         size="lg"
+        rounded="full"
         className="w-full"
         {...(_.size(errors) > 0
           ? {

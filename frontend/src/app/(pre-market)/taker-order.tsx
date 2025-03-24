@@ -106,7 +106,13 @@ export function TakerOrder() {
           ),
           ({ connected }) => {
             return (
-              <Button variant="active" disabled size="lg" className="w-full">
+              <Button
+                variant="active"
+                disabled
+                size="lg"
+                className="w-full"
+                rounded="full"
+              >
                 {connected ? "Select Order First" : "Please Connect Wallet"}
               </Button>
             )
@@ -123,6 +129,7 @@ export function TakerOrder() {
                 variant="brand"
                 size="lg"
                 className="w-full"
+                rounded="full"
                 onClick={async () => {
                   await fillOrder.mutateAsync()
                   unselectAllOrders()
