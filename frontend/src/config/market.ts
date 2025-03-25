@@ -85,12 +85,12 @@ export const preMarkets: { [key in Network]: PreMarket } = {
       //   exponent: 9,
       // },
     ],
-    // resolution: {
-    //   finalCoinType: "0x2::sui::SUI",
-    //   exponent: 9,
-    //   settlementStart: new Date(1742882150045),
-    //   deliveryBefore: new Date(1742882750045),
-    // },
+    resolution: {
+      finalCoinType: "0x2::sui::SUI",
+      exponent: 9,
+      settlementStart: new Date(1742917296575),
+      deliveryBefore: new Date(1742917896575),
+    },
     fee: {
       buyer: 0.02, // 2%
       seller: 0.02, // 2%

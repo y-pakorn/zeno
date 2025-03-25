@@ -99,18 +99,23 @@ export function MarketHeader() {
           )}
         </div>
       </div>
-      <div>
-        <div className="text-muted-foreground font-semibold">Open Interest</div>
-        <div className="text-base">
-          {isOpenInterestLoading ? (
-            <Skeleton key="loading" className="h-6 w-12" />
-          ) : openInterest ? (
-            <span key="interest">${openInterest.toFormat(2)}</span>
-          ) : (
-            <span key="empty">-</span>
-          )}
+      {(!market.resolution ||
+        new Date() <= market.resolution.settlementStart) && (
+        <div>
+          <div className="text-muted-foreground font-semibold">
+            Open Interest
+          </div>
+          <div className="text-base">
+            {isOpenInterestLoading ? (
+              <Skeleton key="loading" className="h-6 w-12" />
+            ) : openInterest ? (
+              <span key="interest">${openInterest.toFormat(2)}</span>
+            ) : (
+              <span key="empty">-</span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
       <div>
         <div className="text-muted-foreground font-semibold">Total Supply</div>
         <div className="text-base">
