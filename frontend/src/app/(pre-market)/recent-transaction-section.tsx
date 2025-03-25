@@ -19,6 +19,7 @@ export function RecentTransactionSection() {
   const { market, collateralPrices } = useMarket()
   const { data: filledOrders, isLoading } = useFilledOrderEvents({
     market,
+    refetchInterval: 11 * 1000, // 11 seconds
   })
   const {
     networkConfig: { explorerUrl },

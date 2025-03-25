@@ -73,16 +73,16 @@ export const preMarkets: { [key in Network]: PreMarket } = {
           "0x23d7315113f5b1d3ba7a83604c44b94d79f4fd69af77f804fc7f920a6dc65744",
         exponent: 9,
       },
-      {
-        coinType:
-          "0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC",
-        ticker: "USDC",
-        icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
-        minimumAmount: 10, // 10 usdc
-        pythId:
-          "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
-        exponent: 9,
-      },
+      // {
+      //   coinType:
+      //     "0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC",
+      //   ticker: "USDC",
+      //   icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
+      //   minimumAmount: 10, // 10 usdc
+      //   pythId:
+      //     "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+      //   exponent: 9,
+      // },
     ],
     // resolution: {
     //   finalCoinType: "0x2::sui::SUI",
