@@ -2,20 +2,13 @@ import { useEffect, useState } from "react"
 import { useSuiClient } from "@mysten/dapp-kit"
 import { SuiClient } from "@mysten/sui/client"
 import {
-  QueryClient,
   useQuery,
   useQueryClient,
   UseQueryOptions,
 } from "@tanstack/react-query"
-import BigNumber from "bignumber.js"
 
 import { Collateral, PreMarket } from "@/types/market"
-import {
-  OpenOrder,
-  OpenOrderEvent,
-  OrderCancelledEvent,
-  OrderFilledEvent,
-} from "@/types/order"
+import { OpenOrder } from "@/types/order"
 import { parseOpenOrder } from "@/lib/contract"
 
 import {
@@ -52,74 +45,79 @@ export function useOpenOrders({
   })
 
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now())
-  const __ = useOpenOrderEvents({
+  const openOrderEvents = useOpenOrderEvents({
     market,
     enabled: !!query.data,
     refetchInterval: 11 * 1000, // 11 seconds
-    select: (data) => {
-      const prevOrders = queryClient.getQueryData<OpenOrder[]>([
-        "open-orders",
-        market.id,
-      ])
-
-      if (!prevOrders) return []
-      const ids = new Set(prevOrders?.map((o) => o.id))
-      const insertedOrders: OpenOrder[] = []
-      for (const event of data) {
-        if (ids.has(event.id)) continue
-        if (event.createdAt.getTime() < lastUpdated) continue
-        insertedOrders.push(event)
-      }
-      if (insertedOrders.length > 0) {
-        queryClient.setQueryData<OpenOrder[]>(
-          ["open-orders", market.id],
-          (old) => {
-            return [...(old || []), ...insertedOrders]
-          }
-        )
-        setLastUpdated(Date.now())
-      }
-      return []
-    },
   })
 
-  const ___ = useCancelledOrderEvents({
-    market,
-    enabled: !!query.data,
-    refetchInterval: 11 * 1000, // 11 seconds
-    select: (data) => {
-      const toRemoveIds: Set<string> = new Set()
-      for (const event of data) {
-        toRemoveIds.add(event.order_id)
-      }
+  useEffect(() => {
+    if (!openOrderEvents.data) return
+
+    const prevOrders = queryClient.getQueryData<OpenOrder[]>([
+      "open-orders",
+      market.id,
+    ])
+
+    if (!prevOrders?.length) return
+
+    const ids = new Set(prevOrders?.map((o) => o.id))
+    const insertedOrders: OpenOrder[] = []
+
+    for (const event of openOrderEvents.data) {
+      if (ids.has(event.id)) continue
+      if (event.createdAt.getTime() < lastUpdated) continue
+      insertedOrders.push(event)
+    }
+
+    if (insertedOrders.length > 0) {
       queryClient.setQueryData<OpenOrder[]>(
         ["open-orders", market.id],
         (old) => {
-          return old?.filter((o) => !toRemoveIds.has(o.id))
+          return [...(old || []), ...insertedOrders]
         }
       )
-      return []
-    },
-  })
+      setLastUpdated(Date.now())
+    }
+  }, [openOrderEvents.data, lastUpdated, market.id])
 
-  const _ = useFilledOrderEvents({
+  const cancelledOrderEvents = useCancelledOrderEvents({
     market,
     enabled: !!query.data,
     refetchInterval: 11 * 1000, // 11 seconds
-    select: (data) => {
-      const toRemoveIds: Set<string> = new Set()
-      for (const event of data) {
-        toRemoveIds.add(event.id)
-      }
-      queryClient.setQueryData<OpenOrder[]>(
-        ["open-orders", market.id],
-        (old) => {
-          return old?.filter((o) => !toRemoveIds.has(o.id))
-        }
-      )
-      return []
-    },
   })
+
+  useEffect(() => {
+    if (!cancelledOrderEvents.data) return
+
+    const toRemoveIds: Set<string> = new Set()
+    for (const event of cancelledOrderEvents.data) {
+      toRemoveIds.add(event.order_id)
+    }
+
+    queryClient.setQueryData<OpenOrder[]>(["open-orders", market.id], (old) => {
+      return old?.filter((o) => !toRemoveIds.has(o.id))
+    })
+  }, [cancelledOrderEvents.data, market.id])
+
+  const filledOrderEvents = useFilledOrderEvents({
+    market,
+    enabled: !!query.data,
+    refetchInterval: 11 * 1000, // 11 seconds
+  })
+
+  useEffect(() => {
+    if (!filledOrderEvents.data) return
+
+    const toRemoveIds: Set<string> = new Set()
+    for (const event of filledOrderEvents.data) {
+      toRemoveIds.add(event.id)
+    }
+
+    queryClient.setQueryData<OpenOrder[]>(["open-orders", market.id], (old) => {
+      return old?.filter((o) => !toRemoveIds.has(o.id))
+    })
+  }, [filledOrderEvents.data, market.id])
 
   return query
 }

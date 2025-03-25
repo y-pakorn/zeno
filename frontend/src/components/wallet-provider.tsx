@@ -31,6 +31,7 @@ export const networks = Object.keys(networkConfig) as Network[]
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      experimental_prefetchInRender: true,
       refetchOnReconnect: false,
       refetchOnWindowFocus: false,
       refetchOnMount: false,

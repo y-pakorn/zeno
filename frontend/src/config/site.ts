@@ -3,7 +3,7 @@ import { env } from "@/env.mjs"
 export const siteConfig = {
   name: "Zeno",
   author: "Zeno",
-  description: "Zeno Marketplace",
+  description: "Zeno Market",
   keywords: ["Zeno", "Marketplace", "NFTs", "Crypto", "Pre-market", "Token"],
   logo: "/assets/logo.svg",
   logoText: "/assets/logo-text.svg",
@@ -15,5 +15,5 @@ export const siteConfig = {
     github: "",
   },
   ogImage: `${env.NEXT_PUBLIC_APP_URL}/og.jpg`,
-  twitter: "@zenomarketplace",
+  twitter: "@zeno_market",
 }
