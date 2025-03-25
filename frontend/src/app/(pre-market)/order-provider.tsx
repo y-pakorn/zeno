@@ -63,6 +63,21 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     setSelectedOrderIds(new Set())
   }, [account])
 
+  useEffect(() => {
+    if (!openOrders.data) return
+    setSelectedOrderIds((oldIds) => {
+      const newIds = new Set(oldIds)
+      const openOrderIds = new Set(openOrders.data.map((order) => order.id))
+      // remove ids that are not in the open orders
+      newIds.forEach((id) => {
+        if (!openOrderIds.has(id)) {
+          newIds.delete(id)
+        }
+      })
+      return newIds
+    })
+  }, [openOrders.data])
+
   const selected = useMemo(() => {
     if (!openOrders.data) return
     if (selectedOrderIds.size === 0) return

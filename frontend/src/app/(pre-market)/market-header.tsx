@@ -25,7 +25,7 @@ export function MarketHeader() {
   const isLatestPriceLoading =
     filledOrders.isPending || collateralPrices.isPending
   const latestPrice = useMemo(() => {
-    if (!filledOrders.data) return null
+    if (!filledOrders.data?.length) return null
     const lastFilledOrder = filledOrders.data[0]
     const price = lastFilledOrder.rate.multipliedBy(
       collateralPrices.data?.[lastFilledOrder.collateral.coinType] || 0

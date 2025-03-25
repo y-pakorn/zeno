@@ -157,6 +157,7 @@ export function TakerOrder() {
                 rounded="full"
                 onClick={async () => {
                   await fillOrder.mutateAsync()
+                  balance.refetch()
                   unselectAllOrders()
                 }}
                 disabled={fillOrder.isPending}

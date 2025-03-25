@@ -50,9 +50,47 @@ import { Transaction } from "@mysten/sui/transactions";
     receipt.objectChanges!.find(
       (c) =>
         c.type === "created" &&
-        c.objectType === `${contract.packageId}::zeno::PreMarket`,
+        c.objectType === `${contract.packageId}::zeno::PreMarket`
     ) as any
   ).objectId as string;
 
   console.log("Market created", marketId);
+
+  const txb2 = new Transaction();
+
+  txb2.moveCall({
+    target: `${contract.packageId}::zeno::set_collateral_type`,
+    arguments: [
+      txb2.object(contract.adminCap),
+      txb2.object(marketId),
+      txb2.pure.u64(5_000_000_000), // 5 SUI
+    ],
+    typeArguments: ["0x2::sui::SUI"],
+  });
+
+  txb2.setSender(keypair.toSuiAddress());
+
+  const tx2 = await txb2.build({
+    client,
+  });
+
+  const simResult2 = await client.dryRunTransactionBlock({
+    transactionBlock: tx2,
+  });
+
+  if (simResult2.effects.status.status !== "success") {
+    console.error("Transaction failed", simResult2);
+    return;
+  }
+
+  const result2 = await client.signAndExecuteTransaction({
+    transaction: tx2,
+    signer: keypair,
+  });
+
+  const receipt2 = await client.waitForTransaction({
+    digest: result2.digest,
+  });
+
+  console.log("Set collateral types successful", receipt2);
 })();

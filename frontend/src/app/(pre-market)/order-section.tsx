@@ -1,21 +1,8 @@
-import { useMemo, useState } from "react"
-import dayjs from "dayjs"
+import { useEffect, useMemo, useState } from "react"
 import _ from "lodash"
 import { Bookmark, ChevronLeft, Loader2, Plus } from "lucide-react"
 
-import { OpenOrder } from "@/types/order"
-import { useCancelOrder } from "@/hooks/use-cancel-order"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { EmptyState } from "@/components/empty-state"
@@ -23,12 +10,20 @@ import { OrderCard } from "@/components/order-card"
 
 import { MakerOrder } from "./maker-order"
 import { useMarket } from "./market-provider"
+import { useOrder } from "./order-provider"
 import { TakerOrder } from "./taker-order"
 
 export const ORDER_SECTION_WIDTH = "330px"
 
 export function OrderSection() {
+  const { selectedOrderIds } = useOrder()
   const [isTaker, setIsTaker] = useState(true)
+
+  useEffect(() => {
+    if (selectedOrderIds.size) {
+      setIsTaker(true)
+    }
+  }, [selectedOrderIds.size])
 
   return (
     <div

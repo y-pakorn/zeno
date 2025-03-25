@@ -113,7 +113,9 @@ public struct Stats has copy, drop, store {
 #[allow(unused_field)]
 public struct Resolution has copy, drop, store {
     resolved_at: u64,
+    /// if settlement start time is past, the user cannot create and fill orders, but can settle, claim, cancel, close
     settlement_start: u64,
+    /// if delivery before time is past, the user cannot settle, but can claim, cancel, close
     delivery_before: u64,
     coin_type: TypeName,
     /// decimal adjustment difference between the collateral and the coin in mist (9 decimals)
@@ -458,11 +460,11 @@ public fun cancel_order<T>(
     );
     object::delete(id);
 
-    // if cancel before delivery time, charge cancel fee
+    // if cancel before settlement start time, charge cancel fee
     if (
         premarket
             .resolution
-            .map_ref!(|m| clock.timestamp_ms() <= m.delivery_before)
+            .map_ref!(|m| clock.timestamp_ms() <= m.settlement_start)
             .get_with_default(false)
     ) {
         let fee_value = collateral.value() * premarket.cancel_fee_rate_bps / 10_000;
@@ -480,6 +482,15 @@ public fun fill_order<T>(
     clock: &Clock,
     ctx: &mut TxContext,
 ) {
+    // check market is not paused
+    assert!(!market.is_paused, E_MARKET_PAUSED);
+
+    if (market.resolution.is_some()) {
+        let resolution = market.resolution.borrow();
+        // check if settlement start time is past
+        assert!(clock.timestamp_ms() <= resolution.settlement_start, E_SETTLEMENT_TIME_PAST);
+    };
+
     let market_id = object::id(market);
     let order: &mut Order<T> = market.orders.borrow_mut(order_id);
     let minimum_fill_amount = market.collateral_types.get(&type_name::get<T>()).minimum_amount;
@@ -630,11 +641,12 @@ public fun settle_order<T, C>(
         balance: final_coin.into_balance(),
         settled_at: clock.timestamp_ms(),
     };
+    let settled_order_id = object::id(&settled_order);
 
     event::emit(OrderSettled {
         market_id: object::id(market),
         filled_order_id,
-        settled_order_id: object::id(&settled_order),
+        settled_order_id,
     });
 
     market.settled_orders.add(object::id(&settled_order), settled_order);
@@ -660,7 +672,7 @@ public fun settle_order<T, C>(
     );
     modify_order_owner(
         &mut market.order_owner_table,
-        filled_order_id,
+        settled_order_id,
         ModifyOrderType::SettledOrder,
         true,
         buyer,

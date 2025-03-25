@@ -313,6 +313,7 @@ export function MakerOrder() {
                         exponent: collateral!.exponent,
                       },
                     })
+                    balance.refetch()
                     reset()
                   },
                   children: isCreatingOrder ? (

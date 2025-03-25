@@ -4,7 +4,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { CloseOrder } from "@/types/order"
 
-import { triggerUpdateMyOpenOrders } from "./use-my-orders"
+import {
+  triggerUpdateMyFilledOrders,
+  triggerUpdateMyOpenOrders,
+} from "./use-my-orders"
 import { triggerUpdateFilledOrdersEvents } from "./use-order-events"
 import { useSignAndExecute } from "./use-sign-and-execute"
 
@@ -26,6 +29,7 @@ export const useCloseOrder = () => {
           txb.pure.id(closeOrderParams.filledOrderId),
           txb.object("0x6"),
         ],
+        typeArguments: [closeOrderParams.collateralCoinType],
       })
 
       txb.transferObjects([coin], account.address)
@@ -34,11 +38,7 @@ export const useCloseOrder = () => {
         transaction: txb,
       })
 
-      await triggerUpdateFilledOrdersEvents(
-        queryClient,
-        closeOrderParams.market.id
-      )
-      await triggerUpdateMyOpenOrders(queryClient, closeOrderParams.market.id)
+      await triggerUpdateMyFilledOrders(queryClient, closeOrderParams.market.id)
 
       return tx
     },

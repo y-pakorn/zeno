@@ -50,8 +50,8 @@ const Portfolio = memo(function Portfolio({
       .orderBy((o) =>
         match(o)
           .with({ type: "open" }, ({ order }) => -order.createdAt)
-          .with({ type: "settled" }, ({ order }) => -order.settledAt)
           .with({ type: "filled" }, ({ order }) => -order.filledAt)
+          .with({ type: "settled" }, ({ order }) => -order.settledAt)
           .exhaustive()
       )
       .value()

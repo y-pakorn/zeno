@@ -18,6 +18,7 @@ import {
   LogOut,
   PieChart,
 } from "lucide-react"
+import { toast } from "sonner"
 
 import { cn, formatAddress } from "@/lib/utils"
 
@@ -83,7 +84,15 @@ function ConnectedWalletButtonContent({
               {formatAddress(currentAccount.address)}
             </div>
           </div>
-          <Button variant="ghostSubtle" size="icon" className="ml-auto">
+          <Button
+            variant="ghostSubtle"
+            size="icon"
+            className="ml-auto"
+            onClick={async () => {
+              await navigator.clipboard.writeText(currentAccount.address)
+              toast.success("Copied to clipboard")
+            }}
+          >
             <Copy />
           </Button>
           <Button variant="ghostSubtle" size="icon">

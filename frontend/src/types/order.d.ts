@@ -111,6 +111,7 @@ export type ClaimOrder = {
 export type CloseOrder = {
   market: PreMarket
   filledOrderId: string
+  collateralCoinType: string
 }
 
 export type OpenOrderEvent = {
