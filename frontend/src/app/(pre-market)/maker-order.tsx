@@ -238,6 +238,7 @@ export function MakerOrder() {
               if (!floorPrice) return
               setValue("pricePerToken", floorPrice.precision(4))
             }}
+            className="rounded-none border-x-0 border-t-0"
           >
             Floor
           </Button>
