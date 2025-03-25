@@ -95,7 +95,7 @@ export function MakerOrder() {
   )
 
   const {
-    formState: { errors, isValid },
+    formState: { errors },
     setValue,
     register,
     setError,
@@ -236,7 +236,9 @@ export function MakerOrder() {
             disabled={!floorPrice}
             onClick={() => {
               if (!floorPrice) return
-              setValue("pricePerToken", floorPrice.precision(4))
+              setValue("pricePerToken", floorPrice.toPrecision(4) as any, {
+                shouldValidate: true,
+              })
             }}
             className="rounded-none border-x-0 border-t-0"
           >
@@ -301,30 +303,30 @@ export function MakerOrder() {
         size="lg"
         rounded="full"
         className="w-full"
-        {...(_.size(errors) > 0
+        {...(!address
           ? {
               disabled: true,
-              variant: "destructive",
-              children: _.chain(errors).values().last().value().message,
+              variant: "active",
+              children: "Please Connect Wallet",
             }
-          : result &&
-              collateral &&
-              new BigNumber(balance?.data?.totalBalance || "0")
-                .shiftedBy(-collateral.exponent)
-                .lt(result.collateralAmount)
+          : _.size(errors) > 0
             ? {
                 disabled: true,
                 variant: "destructive",
-                children: "Insufficient Balance",
+                children: _.chain(errors).values().last().value().message,
               }
-            : !address
+            : result &&
+                collateral &&
+                new BigNumber(balance?.data?.totalBalance || "0")
+                  .shiftedBy(-collateral.exponent)
+                  .lt(result.collateralAmount)
               ? {
                   disabled: true,
-                  variant: "active",
-                  children: "Please Connect Wallet",
+                  variant: "destructive",
+                  children: "Insufficient Balance",
                 }
               : {
-                  disabled: !isValid || isCreatingOrder,
+                  disabled: isCreatingOrder,
                   variant: "brand",
                   onClick: async () => {
                     await createOrder({
