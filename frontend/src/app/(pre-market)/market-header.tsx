@@ -81,7 +81,7 @@ export function MarketHeader() {
           {isLatestPriceLoading ? (
             <Skeleton key="loading" className="h-8 w-12" />
           ) : latestPrice ? (
-            <span key="price">{latestPrice.toFormat(2)}</span>
+            <span key="price">${latestPrice.toFormat(2)}</span>
           ) : (
             <span key="empty">-</span>
           )}

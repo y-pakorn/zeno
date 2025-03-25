@@ -186,12 +186,12 @@ export function TakerOrder() {
             <div>${selected.averagePriceUsd.toFormat(4)}</div>
             <div>Fee</div>
             <div className="inline-flex items-center justify-end gap-1">
-              {selected.type === "buy"
+              {selected.type === "sell"
                 ? selected.feeBuy.toFormat(4)
                 : selected.feeSell.toFormat(4)}{" "}
               <img
-                src={selected.type === "buy" ? market.icon : selected.icon}
-                alt={selected.type === "buy" ? "buyer" : "seller"}
+                src={selected.type === "sell" ? market.icon : selected.icon}
+                alt={selected.type === "sell" ? "buyer" : "seller"}
                 className="size-4 rounded-full"
               />
             </div>

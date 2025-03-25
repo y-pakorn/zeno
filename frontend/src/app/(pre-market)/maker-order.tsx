@@ -383,7 +383,7 @@ export function MakerOrder() {
                 ? result.feeBuy.toFormat(4)
                 : result.feeSell.toFormat(4)}{" "}
               <img
-                src={type === "buy" ? market.icon : market.icon}
+                src={type === "buy" ? market.icon : collateral.icon}
                 alt={type === "buy" ? "buyer" : "seller"}
                 className="size-4 rounded-full"
               />
