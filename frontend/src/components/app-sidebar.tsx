@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, KanbanSquare, Layout, PieChart } from "lucide-react"
+import { Book, Home, KanbanSquare, Layout, PieChart } from "lucide-react"
 import { FaXTwitter } from "react-icons/fa6"
 
 import { siteConfig } from "@/config/site"
@@ -113,13 +113,23 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="flex-row justify-end group-data-[state=collapsed]:justify-center">
         <Link
-          href={`https://x.com/${siteConfig.twitter}`}
+          href={siteConfig.links.twitter}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group-data-[state=collapsed]:hidden"
+        >
+          <Button variant="ghost" size="icon">
+            <FaXTwitter />
+          </Button>
+        </Link>
+        <Link
+          href={siteConfig.links.docs}
           target="_blank"
           rel="noopener noreferrer"
           className="mr-auto group-data-[state=collapsed]:hidden"
         >
           <Button variant="ghost" size="icon">
-            <FaXTwitter />
+            <Book />
           </Button>
         </Link>
         <SidebarTrigger size="icon" rounded="full" variant="outline">

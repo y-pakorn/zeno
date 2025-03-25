@@ -45,11 +45,6 @@ export const MarketProvider = ({ children }: { children: React.ReactNode }) => {
     return preMarkets[network]
   }, [network])
 
-  const price = 0.96
-  const change24h = 240.5
-  const volume24h = 12300
-  const volumeTotal = 109420
-
   const onchainMarket = useOnchainMarket({
     market,
   })

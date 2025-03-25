@@ -51,8 +51,6 @@ export function useOpenOrders({
     refetchInterval: 11 * 1000, // 11 seconds
   })
 
-  console.log(openOrderEvents.data, openOrderEvents.error)
-
   useEffect(() => {
     if (!openOrderEvents.data) return
 

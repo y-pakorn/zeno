@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     for (const event of events.data) {
       const eventData = event.parsedJson as any
-      const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
+      const coinType = "0x" + eventData.collateral_type.name.replace(/^0+/, "")
       const collateralPrice = new BigNumber(eventData.rate)
         .shiftedBy(-9)
         .toNumber()

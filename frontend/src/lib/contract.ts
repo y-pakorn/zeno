@@ -116,7 +116,7 @@ export function parseOpenOrderEvent(
   market: PreMarket
 ): OpenOrder {
   const eventData = event.parsedJson as OpenOrderEvent
-  const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
+  const coinType = "0x" + eventData.collateral_type.name.replace(/^0+/, "")
   const collateral = market.collaterals.find((c) => c.coinType === coinType)!
   return {
     id: eventData.order_id,
@@ -143,7 +143,7 @@ export function parseFilledOrderEvent(
   market: PreMarket
 ): FilledOrder {
   const eventData = event.parsedJson as OrderFilledEvent
-  const coinType = eventData.collateral_type.name.replace(/^0+/, "0x")
+  const coinType = "0x" + eventData.collateral_type.name.replace(/^0+/, "")
   const collateral = market.collaterals.find((c) => c.coinType === coinType)!
   return {
     id: eventData.order_id,

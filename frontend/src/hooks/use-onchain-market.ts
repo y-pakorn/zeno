@@ -43,7 +43,7 @@ export function useOnchainMarket({
         },
         collateral: _.fromPairs(
           data.fields.collateral_types.fields.contents.map((c: any) => {
-            const coinType = c.fields.key.fields.name.replace(/^0+/, "0x")
+            const coinType = "0x" + c.fields.key.fields.name.replace(/^0+/, "")
             const exponent = market.collaterals.find(
               (c) => c.coinType === coinType
             )!.exponent
