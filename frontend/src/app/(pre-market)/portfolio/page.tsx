@@ -4,7 +4,7 @@ import { memo, useMemo, useState } from "react"
 import { useCurrentAccount } from "@mysten/dapp-kit"
 import { WalletAccount } from "@mysten/wallet-standard"
 import _ from "lodash"
-import { ChevronDown, Wallet } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { match } from "ts-pattern"
 
 import { Button } from "@/components/ui/button"
@@ -14,7 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { EmptyState } from "@/components/empty-state"
 import { Icons } from "@/components/icons"
 import { OrderCard, OrderCardProps } from "@/components/order-card"
@@ -47,11 +46,7 @@ export default function PortfolioPage() {
   return <Portfolio account={account} />
 }
 
-const Portfolio = memo(function Portfolio({
-  account,
-}: {
-  account: WalletAccount
-}) {
+const Portfolio = memo(function Portfolio({}: { account: WalletAccount }) {
   const { myOrders, market } = useMarket()
 
   const orders = useMemo(() => {
@@ -127,7 +122,7 @@ const Portfolio = memo(function Portfolio({
           <DropdownMenuContent>
             {[undefined, "open", "filled", "settled"].map((status) => (
               <DropdownMenuItem
-                key={status}
+                key={status || "all"}
                 onClick={() =>
                   setFilters({ ...filters, status: status as any })
                 }

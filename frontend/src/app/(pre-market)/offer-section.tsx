@@ -6,9 +6,8 @@ import _ from "lodash"
 import { ChevronDown, CircleX } from "lucide-react"
 
 import { Collateral } from "@/types/market"
-import { Offer, OpenOrder } from "@/types/order"
+import { Offer } from "@/types/order"
 import { cn, formatBigNumber } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,7 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { DataTable } from "@/components/data-table"
 import { EmptyState } from "@/components/empty-state"
@@ -176,7 +174,7 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
   const { buy, sell } = useMemo(() => {
     return {
       buy: _.chain(offers)
-        .filter((o) => o.type === "buy")
+        .filter((o) => o.type === "sell")
         .filter((o) =>
           filters.collateral
             ? o.collateral.coinType === filters.collateral
@@ -188,7 +186,7 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
         .sortBy((p) => -p.price)
         .value(),
       sell: _.chain(offers)
-        .filter((o) => o.type === "sell")
+        .filter((o) => o.type === "buy")
         .filter((o) =>
           filters.collateral
             ? o.collateral.coinType === filters.collateral

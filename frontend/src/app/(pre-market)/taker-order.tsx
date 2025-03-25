@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit"
 import BigNumber from "bignumber.js"
 import { match, P } from "ts-pattern"
@@ -58,13 +57,13 @@ export function TakerOrder() {
               <span className="text-success">Buying</span>
             )
           }
-          value={selected?.totalAmount.toFormat(4)}
+          value={selected?.totalAmount.toFormat(4) || "-"}
           token={market}
-          isEstimated
+          isEstimated={!!selected}
         />
         <AmountInput
           label="Collateral"
-          value={selected?.totalCollateralAmount.toString()}
+          value={selected?.totalCollateralAmount.toString() || "-"}
           token={selected}
           balance={
             balance.isFetching ? (

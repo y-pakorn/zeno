@@ -2,31 +2,19 @@
 
 import { createContext, useContext, useMemo, useState } from "react"
 import {
-  createNetworkConfig,
   WalletProvider as DappKitWalletProvider,
   SuiClientProvider,
 } from "@mysten/dapp-kit"
-import { getFullnodeUrl } from "@mysten/sui/client"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import "@mysten/dapp-kit/dist/index.css"
 
-const defaultNetwork = "devnet"
-
-// Config options for the networks you want to connect to
-export const { networkConfig } = createNetworkConfig({
-  mainnet: {
-    url: getFullnodeUrl("mainnet"),
-    explorerUrl: "https://suiscan.xyz",
-  },
-  devnet: {
-    url: getFullnodeUrl("devnet"),
-    explorerUrl: "https://suiscan.xyz/devnet",
-  },
-})
-
-export type Network = keyof typeof networkConfig
-export const networks = Object.keys(networkConfig) as Network[]
+import {
+  defaultNetwork,
+  Network,
+  NetworkConfig,
+  networkConfig,
+} from "@/config/network"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,7 +30,7 @@ const queryClient = new QueryClient({
 
 const NetworkContext = createContext<{
   network: Network
-  networkConfig: (typeof networkConfig)[keyof typeof networkConfig]
+  networkConfig: NetworkConfig
   setNetwork: (network: Network) => void
 }>({
   network: defaultNetwork,

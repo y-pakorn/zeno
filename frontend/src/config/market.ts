@@ -1,5 +1,6 @@
 import { PreMarket } from "@/types/market"
-import { Network } from "@/components/wallet-provider"
+
+import { Network } from "./network"
 
 export const preMarkets: { [key in Network]: PreMarket } = {
   mainnet: {

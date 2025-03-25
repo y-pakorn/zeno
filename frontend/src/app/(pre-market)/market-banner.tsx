@@ -1,5 +1,3 @@
-import { NAVBAR_HEIGHT } from "@/components/app-navbar"
-
 import { useMarket } from "./market-provider"
 
 export const BANNER_HEIGHT = "260px"

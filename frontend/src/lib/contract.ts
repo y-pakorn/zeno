@@ -94,7 +94,6 @@ export function parseSettledOrder(
   }
 ): SettledOrder {
   const data = object.data?.content as any
-  console.log(data)
   const settledOrderData = data.fields.value.fields
 
   return {

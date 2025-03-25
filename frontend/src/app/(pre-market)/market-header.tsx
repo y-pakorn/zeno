@@ -5,7 +5,6 @@ import _ from "lodash"
 import numbro from "numbro"
 import { FaDiscord, FaGlobe, FaXTwitter } from "react-icons/fa6"
 
-import { cn } from "@/lib/utils"
 import { useFilledOrderEvents } from "@/hooks/use-order-events"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
@@ -65,30 +64,30 @@ export function MarketHeader() {
   }, [openOrders.data, collateralPrices.data])
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border px-4 py-3 text-sm font-medium">
+    <div className="flex items-center gap-6 rounded-2xl border px-4 py-3 text-sm font-medium">
       <img
         className="size-12 shrink-0 rounded-full"
         src={market.icon}
         alt="logo"
       />
       <div className="-ml-2">
-        <div className="text-lg font-bold">{market.name}</div>
+        <div className="text-lg font-bold">{market.ticker}</div>
         <Badge variant={market.isLive ? "success" : "error"}>
           {market.isLive ? "LIVE" : "UPCOMING"}
         </Badge>
       </div>
-      <div className="ml-12">
+      <div className="ml-8">
         <div className="text-lg font-bold">
           {isLatestPriceLoading ? (
             <Skeleton key="loading" className="h-8 w-12" />
           ) : latestPrice ? (
-            <span key="price">${latestPrice.toFormat(2)}</span>
+            <span key="price">{latestPrice.toFormat(2)}</span>
           ) : (
             <span key="empty">-</span>
           )}
         </div>
       </div>
-      <div className="ml-4">
+      <div>
         <div className="text-muted-foreground font-semibold">Total Vol</div>
         <div className="text-base">
           {isTotalVolumeLoading ? (
@@ -100,7 +99,7 @@ export function MarketHeader() {
           )}
         </div>
       </div>
-      <div className="ml-4">
+      <div>
         <div className="text-muted-foreground font-semibold">Open Interest</div>
         <div className="text-base">
           {isOpenInterestLoading ? (

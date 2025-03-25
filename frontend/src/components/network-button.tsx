@@ -3,6 +3,7 @@
 import _ from "lodash"
 import { ChevronDown } from "lucide-react"
 
+import { networks } from "@/config/network"
 import { cn } from "@/lib/utils"
 
 import { Icons } from "./icons"
@@ -13,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
-import { networks, useNetwork } from "./wallet-provider"
+import { useNetwork } from "./wallet-provider"
 
 export function NetworkButton({
   className,
