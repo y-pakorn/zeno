@@ -1,8 +1,12 @@
 "use client"
 
 import { headers } from "next/headers"
+import Link from "next/link"
+import { FaXTwitter } from "react-icons/fa6"
 
+import { siteConfig } from "@/config/site"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/empty-state"
 import { Icons } from "@/components/icons"
 
@@ -20,8 +24,25 @@ export default function PreMarketLayout({
       <EmptyState
         icon={Icons.logo}
         header="Mobile Not Supported"
-        description="Please use a desktop browser to access this page."
-      />
+        description={
+          <>
+            Please use a desktop browser to access this page.
+            <br />
+            Mobile support is coming soon.
+          </>
+        }
+      >
+        <Link
+          className="mt-2"
+          href={`https://x.com/${siteConfig.twitter}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button>
+            Follow us on <FaXTwitter />
+          </Button>
+        </Link>
+      </EmptyState>
     )
   }
 
