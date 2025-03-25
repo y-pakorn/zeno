@@ -1,5 +1,6 @@
 import { ComponentProps, memo, useMemo, useState } from "react"
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit"
+import BigNumber from "bignumber.js"
 import _ from "lodash"
 import { Loader2 } from "lucide-react"
 import { match } from "ts-pattern"
@@ -25,6 +26,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog"
 import { Separator } from "./ui/separator"
+import { Skeleton } from "./ui/skeleton"
 
 export type OrderCardProps =
   | {
@@ -332,7 +334,20 @@ export const FilledOrderButton = memo(function FilledOrderButton({
             </DialogHeader>
             <div className="space-y-1 text-xs font-medium">
               <div className="flex items-center gap-2">
-                <div>Settled Amount</div>
+                <div>Your {market.ticker} Balance</div>
+                <div className="ml-auto">
+                  {balance.isPending ? (
+                    <Skeleton className="h-5 w-12" />
+                  ) : (
+                    new BigNumber(balance.data?.totalBalance || 0)
+                      .shiftedBy(market.resolution.exponent || 9)
+                      .toFormat(4)
+                  )}
+                </div>
+                <img src={market.icon} className="size-4 shrink-0" />
+              </div>
+              <div className="flex items-center gap-2">
+                <div>Settled {market.ticker} Amount</div>
                 <div className="text-error ml-auto">
                   {order.collateral.amount.div(order.rate).toFormat(4)}
                 </div>

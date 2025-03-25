@@ -3,7 +3,7 @@ import { useCurrentAccount } from "@mysten/dapp-kit"
 import { ColumnDef } from "@tanstack/react-table"
 import BigNumber from "bignumber.js"
 import _ from "lodash"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, CircleX } from "lucide-react"
 
 import { Collateral } from "@/types/market"
 import { Offer, OpenOrder } from "@/types/order"
@@ -19,6 +19,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { DataTable } from "@/components/data-table"
+import { EmptyState } from "@/components/empty-state"
 
 import { useBook } from "./book-provider"
 import { useMarket } from "./market-provider"
@@ -57,7 +58,30 @@ export function OfferSection({
   })
 
   return (
-    <div className={cn("flex w-full flex-col gap-2", className)} {...props}>
+    <div
+      className={cn(
+        "flex w-full flex-col gap-2",
+        market.resolution &&
+          new Date() > market.resolution.settlementStart &&
+          "pointer-events-none relative opacity-50",
+        className
+      )}
+      {...props}
+    >
+      {market.resolution && new Date() > market.resolution.settlementStart && (
+        <EmptyState
+          icon={CircleX}
+          className="absolute inset-0 z-10 [&]:opacity-100!"
+          header="Market Closed"
+          description={
+            <>
+              The market is already in the settlement period.
+              <br />
+              Please manage your orders in portfolio.
+            </>
+          }
+        />
+      )}
       <h2 className="font-heading text-2xl font-bold">Offers</h2>
       <div className="flex items-center gap-4">
         <ToggleGroup

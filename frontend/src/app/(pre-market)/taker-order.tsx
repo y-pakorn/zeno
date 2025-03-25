@@ -86,6 +86,8 @@ export function TakerOrder() {
           new BigNumber(balance.data.totalBalance)
             .shiftedBy(-selected.exponent)
             .lt(selected.totalCollateralAmount),
+        closed:
+          market.resolution && new Date() > market.resolution.settlementStart,
       })
         .with(
           P.union(
@@ -95,9 +97,13 @@ export function TakerOrder() {
             {
               connected: true,
               selected: P.nullish,
+            },
+            {
+              connected: true,
+              closed: true,
             }
           ),
-          ({ connected }) => {
+          ({ connected, closed }) => {
             return (
               <Button
                 variant="active"
@@ -106,7 +112,11 @@ export function TakerOrder() {
                 className="w-full"
                 rounded="full"
               >
-                {connected ? "Select Order First" : "Please Connect Wallet"}
+                {connected
+                  ? closed
+                    ? "Market Closed"
+                    : "Select Order First"
+                  : "Please Connect Wallet"}
               </Button>
             )
           }

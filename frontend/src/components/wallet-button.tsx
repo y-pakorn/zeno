@@ -32,6 +32,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
+import { useNetwork } from "./wallet-provider"
 
 export function WalletButton({
   ...props
@@ -60,6 +61,7 @@ function ConnectedWalletButtonContent({
   const accounts = useAccounts()
   const { mutateAsync: disconnect } = useDisconnectWallet()
   const { mutateAsync: switchAccount } = useSwitchAccount()
+  const { networkConfig } = useNetwork()
 
   return (
     <DropdownMenu>
@@ -95,9 +97,15 @@ function ConnectedWalletButtonContent({
           >
             <Copy />
           </Button>
-          <Button variant="ghostSubtle" size="icon">
-            <ExternalLink />
-          </Button>
+          <Link
+            href={`${networkConfig.explorerUrl}/address/${currentAccount.address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="ghostSubtle" size="icon">
+              <ExternalLink />
+            </Button>
+          </Link>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

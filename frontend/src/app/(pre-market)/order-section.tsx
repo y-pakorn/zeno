@@ -93,7 +93,7 @@ export function MyOpenOrder() {
   }, [openOrders.data, collateralPrices.data])
 
   if (!openOrders.data?.length) {
-    return <EmptyState icon={Bookmark} header="No Order Placed" />
+    return <EmptyState icon={Bookmark} description="No Order Placed" opaque />
   }
 
   return (
