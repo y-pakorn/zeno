@@ -3,7 +3,9 @@ import "@/styles/globals.css"
 import type { Metadata, Viewport } from "next"
 import { Instrument_Sans } from "next/font/google"
 import localFont from "next/font/local"
+import { GoogleAnalytics } from "@next/third-parties/google"
 
+import { env } from "@/env.mjs"
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
 import { SidebarProvider } from "@/components/ui/sidebar"
@@ -117,6 +119,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <Toaster />
         </ThemeProvider>
       </body>
+      {env.NEXT_PUBLIC_GA_ID && (
+        <GoogleAnalytics gaId={env.NEXT_PUBLIC_GA_ID} />
+      )}
     </html>
   )
 }
