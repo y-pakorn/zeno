@@ -23,6 +23,7 @@ export function OrderSection() {
     if (selectedOrderIds.size) {
       setIsTaker(true)
     }
+    console.log("set taker triggerd")
   }, [selectedOrderIds.size])
 
   return (

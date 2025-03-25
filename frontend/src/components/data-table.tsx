@@ -32,6 +32,7 @@ export const DataTable = memo(function DataTable<TData, TValue>({
   className,
   isLoadingSkeleton = false,
   skeletonCount = 10,
+  skeletonHeight = "1.5rem",
   ...props
 }: ComponentProps<"div"> & {
   columns: any
@@ -42,6 +43,7 @@ export const DataTable = memo(function DataTable<TData, TValue>({
   options?: Partial<Omit<TableOptions<TData>, "data" | "columns">>
   isLoadingSkeleton?: boolean
   skeletonCount?: number
+  skeletonHeight?: string | number
 }) {
   const { data: finalData, columns: finalColumns } = useMemo(() => {
     return isLoadingSkeleton
@@ -49,7 +51,9 @@ export const DataTable = memo(function DataTable<TData, TValue>({
           data: Array.from({ length: skeletonCount }, () => ({})),
           columns: columns.map((column: any) => ({
             ...column,
-            cell: () => <Skeleton className="h-4 w-full" />,
+            cell: () => (
+              <Skeleton className="w-full" style={{ height: skeletonHeight }} />
+            ),
           })),
         }
       : { data, columns }

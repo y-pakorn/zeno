@@ -17,18 +17,6 @@ export function TakerOrder() {
   const { selectedOrderIds, unselectAllOrders, selected, fillOrder } =
     useOrder()
 
-  const [tab, setTab] = useState<"select" | "sweep">("select")
-  useEffect(() => {
-    if (selectedOrderIds.size > 1) {
-      setTab("sweep")
-    }
-  }, [selectedOrderIds])
-  useEffect(() => {
-    if (selectedOrderIds.size <= 1 && tab === "sweep") {
-      setTab("select")
-    }
-  }, [tab, selectedOrderIds])
-
   const address = useCurrentAccount()
   const balance = useSuiClientQuery(
     "getBalance",
@@ -44,11 +32,10 @@ export function TakerOrder() {
   return (
     <>
       <Tabs
-        value={tab}
+        value={selectedOrderIds.size > 1 ? "sweep" : "select"}
         onValueChange={(v) => {
           if (v === "sweep") return
           unselectAllOrders()
-          setTab(v as "select" | "sweep")
         }}
         className="gap-0"
       >

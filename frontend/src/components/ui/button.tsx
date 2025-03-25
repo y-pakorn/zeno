@@ -24,6 +24,10 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         ghostSubtle: "text-quaternary hover:bg-quaternary/10",
         link: "text-primary underline-offset-4 hover:underline",
+        error:
+          "bg-error/15 text-error shadow-xs border border-error hover:bg-error/25",
+        success:
+          "bg-success/15 text-success shadow-xs border border-success hover:bg-success/25",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

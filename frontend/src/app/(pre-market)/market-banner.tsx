@@ -10,13 +10,11 @@ export function MarketBanner() {
   if (!market.banner) return null
 
   return (
-    <div className="relative pb-8">
-      <img
-        className="absolute top-0 -z-10 w-full object-cover object-right"
-        style={{ height: BANNER_HEIGHT, marginTop: `-${NAVBAR_HEIGHT}` }}
-        src={market.banner}
-        alt="banner"
-      />
-    </div>
+    <img
+      className="absolute top-0 left-0 -z-10 -my-8 w-full rounded-b-2xl object-cover object-right"
+      style={{ height: BANNER_HEIGHT }}
+      src={market.banner}
+      alt="banner"
+    />
   )
 }

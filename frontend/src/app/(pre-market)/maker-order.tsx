@@ -186,6 +186,16 @@ export function MakerOrder() {
     market.fee,
   ])
 
+  const floorPrice = useMemo(() => {
+    const bestOffer = _.chain(offers)
+      .filter((o) => o.type === type)
+      .sortBy((o) => (o.type === "buy" ? o.price : -o.price))
+      .first()
+      .value()
+    if (!bestOffer) return null
+    return bestOffer.price
+  }, [type, offers])
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -219,6 +229,19 @@ export function MakerOrder() {
         prefix="$"
         placeholder="Enter your price"
         inputProps={register("pricePerToken")}
+        suffix={
+          <Button
+            variant="outline"
+            size="xs"
+            disabled={!floorPrice}
+            onClick={() => {
+              if (!floorPrice) return
+              setValue("pricePerToken", floorPrice.precision(4))
+            }}
+          >
+            Floor
+          </Button>
+        }
       />
       <div>
         <AmountInput

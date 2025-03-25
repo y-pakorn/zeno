@@ -61,6 +61,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setSelectedOrderIds(new Set())
+    console.log("set selected order ids to new set")
   }, [account])
 
   useEffect(() => {
@@ -76,6 +77,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       })
       return newIds
     })
+    console.log("set selected order ids to open orders")
   }, [openOrders.data])
 
   const selected = useMemo(() => {

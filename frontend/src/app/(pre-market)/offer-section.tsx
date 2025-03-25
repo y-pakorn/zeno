@@ -239,16 +239,14 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
           const selected = selectedOrderIds.has(row.original.id)
           return (
             <Button
-              variant="ghost"
-              size="xs"
-              className={cn(
-                account?.address === row.original.by
-                  ? false
+              variant={
+                account?.address === row.original.by || selected
+                  ? "outline"
                   : type === "buy"
-                    ? "text-error"
-                    : "text-success",
-                selected && "text-primary"
-              )}
+                    ? "error"
+                    : "success"
+              }
+              size="xs"
               disabled={account?.address === row.original.by}
               onClick={() => {
                 if (!account) return
@@ -287,10 +285,9 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
         transparent
         rowClassName={(row) => {
           const offer = row.original as Offer
-          return cn(
-            selectedOrderIds.has(offer.id) && "bg-brand/5 hover:bg-brand/10"
-          )
+          return cn(selectedOrderIds.has(offer.id) && "bg-secondary")
         }}
+        skeletonCount={20}
       />
       <DataTable
         className={cn(
@@ -303,10 +300,9 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
         transparent
         rowClassName={(row) => {
           const offer = row.original as Offer
-          return cn(
-            selectedOrderIds.has(offer.id) && "bg-brand/5 hover:bg-brand/10"
-          )
+          return cn(selectedOrderIds.has(offer.id) && "bg-secondary")
         }}
+        skeletonCount={20}
       />
     </div>
   )
