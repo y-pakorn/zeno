@@ -1,4 +1,4 @@
-import { client, contract, keypair } from "./constants";
+import { client, contract, contracts, keypair } from "./constants";
 import { Transaction } from "@mysten/sui/transactions";
 
 (async () => {
@@ -8,11 +8,11 @@ import { Transaction } from "@mysten/sui/transactions";
     target: `${contract.packageId}::zeno::create_premarket`,
     arguments: [
       txb.object(contract.adminCap),
-      txb.pure.string("LONG TERM WAL TEST"),
-      txb.pure.u64(200), // 2% in bps
-      txb.pure.u64(200), // 2% in bps
-      txb.pure.u64(0), // 0% in bps
-      txb.pure.u64(200), // 2% in bps
+      txb.pure.string("WAL"),
+      txb.pure.u64(150), // 1.5% in bps
+      txb.pure.u64(150), // 1.5% in bps
+      txb.pure.u64(50), // 0.5% in bps
+      txb.pure.u64(150), // 1.5% in bps
       txb.pure.address(keypair.toSuiAddress()), // fee address
       txb.object("0x6"),
     ],
@@ -50,7 +50,7 @@ import { Transaction } from "@mysten/sui/transactions";
     receipt.objectChanges!.find(
       (c) =>
         c.type === "created" &&
-        c.objectType === `${contract.packageId}::zeno::PreMarket`
+        c.objectType === `${contract.packageId}::zeno::PreMarket`,
     ) as any
   ).objectId as string;
 
@@ -66,6 +66,18 @@ import { Transaction } from "@mysten/sui/transactions";
       txb2.pure.u64(5_000_000_000), // 5 SUI
     ],
     typeArguments: ["0x2::sui::SUI"],
+  });
+
+  txb2.moveCall({
+    target: `${contract.packageId}::zeno::set_collateral_type`,
+    arguments: [
+      txb2.object(contract.adminCap),
+      txb2.object(marketId),
+      txb2.pure.u64(10_000_000_000), // 10 USDC
+    ],
+    typeArguments: [
+      "0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC",
+    ],
   });
 
   txb2.setSender(keypair.toSuiAddress());

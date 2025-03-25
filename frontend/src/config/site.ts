@@ -13,7 +13,8 @@ export const siteConfig = {
     author: "@zeno_market",
   },
   links: {
-    github: "",
+    twitter: "https://x.com/zeno_market",
+    docs: "https://zeno-10.gitbook.io/zeno-1",
   },
   ogImage: `https://i.imgur.com/Fpq9AxV.png`,
   twitter: "@zeno_market",

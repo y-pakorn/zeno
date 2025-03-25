@@ -5,9 +5,10 @@ import { Network } from "./network"
 export const preMarkets: { [key in Network]: PreMarket } = {
   mainnet: {
     id: "mainnet",
-    marketId: "",
     packageId:
-      "0x3f8ebc08a80d8582382bc5dacd9c572b69ea6962bca4720c8cff808543388cf9",
+      "0xdfc9db75d42dfb4980016d1c623a5f325881d647d96fb9ce962830aaf41a6dbf",
+    marketId:
+      "0x00a44a9bf8ed5196f47c462cfe3edd03d6b55646c29101da9507328225ac3ae8",
     name: "Walrus",
     ticker: "WAL",
     icon: "https://img.cryptorank.io/coins/walrus1727864479768.png",
@@ -41,18 +42,18 @@ export const preMarkets: { [key in Network]: PreMarket } = {
       },
     ],
     fee: {
-      buyer: 0.02, // 2%
-      seller: 0.02, // 2%
-      cancel: 0, // 0%
-      penalty: 0.02, // 2%
+      buyer: 0.015, // 1.5%
+      seller: 0.015, // 1.5%
+      cancel: 0.005, // 0.5%
+      penalty: 0.015, // 1.5%
     },
   },
   devnet: {
     id: "devnet",
     packageId:
-      "0x7205f2c818f4c61abf9cde0941c6ced3e9fc414b3d13c4fef18440a8822afb85",
+      "0x1307b9af92bba561acb73780d9b4efa80255c7ba7f1d60c8373261e84afd7e3e",
     marketId:
-      "0x9fc7e3db566485b07fc025717c1414365c969b9c00cff9d996124f7aedc57943",
+      "0x0f21634b863903e29c66a1aeefd42dfb747e46f6805699d3cfa69db538f05d96",
     name: "Walrus",
     ticker: "WAL",
     icon: "https://img.cryptorank.io/coins/walrus1727864479768.png",
@@ -85,12 +86,12 @@ export const preMarkets: { [key in Network]: PreMarket } = {
       //   exponent: 9,
       // },
     ],
-    resolution: {
-      finalCoinType: "0x2::sui::SUI",
-      exponent: 9,
-      settlementStart: new Date(1742917296575),
-      deliveryBefore: new Date(1742917896575),
-    },
+    // resolution: {
+    //   finalCoinType: "0x2::sui::SUI",
+    //   exponent: 9,
+    //   settlementStart: new Date(1742917296575),
+    //   deliveryBefore: new Date(1742917896575),
+    // },
     fee: {
       buyer: 0.02, // 2%
       seller: 0.02, // 2%

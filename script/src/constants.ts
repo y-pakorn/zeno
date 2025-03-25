@@ -5,7 +5,7 @@ import { configDotenv } from "dotenv";
 
 configDotenv();
 
-export const selectedNetwork = "devnet";
+export const selectedNetwork = "mainnet";
 
 export const network = getFullnodeUrl(selectedNetwork);
 export const client = new SuiClient({ url: network });
@@ -16,17 +16,28 @@ export const keypair = Ed25519Keypair.fromSecretKey(secretKey);
 export const contracts = {
   devnet: {
     packageId:
-      "0x7205f2c818f4c61abf9cde0941c6ced3e9fc414b3d13c4fef18440a8822afb85",
+      "0x1307b9af92bba561acb73780d9b4efa80255c7ba7f1d60c8373261e84afd7e3e",
     adminCap:
-      "0xe0245a6166fce6c4b6c2ac3aa257dad3ba517e0c184de0bfaface1f36db42ab7",
+      "0xe91ffe81a806929fd94660459fda022f2db7f5783abc5329df276c0df56d1c0e",
     upgradeCap:
-      "0x2736532bc2b973dfe8f2b1dc2fe90dc6b43b02a48215a63a278cbc583e2465a1",
+      "0xc5b69268977a8e250826e9e8bae338a5a1de4d82723f8e1606c50ed8da46c46d",
     markets: {
-      longTermWal:
-        "0x9fc7e3db566485b07fc025717c1414365c969b9c00cff9d996124f7aedc57943",
+      walrus:
+        "0x0f21634b863903e29c66a1aeefd42dfb747e46f6805699d3cfa69db538f05d96",
     },
   },
-  mainnet: {},
+  mainnet: {
+    packageId:
+      "0xdfc9db75d42dfb4980016d1c623a5f325881d647d96fb9ce962830aaf41a6dbf",
+    adminCap:
+      "0x50aa98ddf9273ee27b2975cddaa1a14667826613a1acbed63beaa0443e4666e8",
+    upgradeCap:
+      "0x0818a332b47c8c91ba1bf0363598aa16e8e74bf4d6e5ff4a3aa5ea34c9af2c4b",
+    markets: {
+      walrus:
+        "0x00a44a9bf8ed5196f47c462cfe3edd03d6b55646c29101da9507328225ac3ae8",
+    },
+  },
 };
 
 export const contract = contracts[selectedNetwork];
