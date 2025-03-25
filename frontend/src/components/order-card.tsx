@@ -74,7 +74,7 @@ export const OrderCard = memo(function OrderCard(order: OrderCardProps) {
   return (
     <div className="bg-secondary space-y-2 rounded-xl px-4 py-3 text-xs font-medium">
       <div className="flex items-center gap-2">
-        <img src={market.icon} className="size-4 shrink-0" />
+        <img src={market.icon} className="size-4 shrink-0 rounded-full" />
         <div className="text-sm font-bold">{market.ticker}</div>
         <Badge
           {...(match(order)
@@ -143,7 +143,7 @@ export const OrderCard = memo(function OrderCard(order: OrderCardProps) {
             <div>Amount</div>
             <div>
               {amount.toFormat(4)}{" "}
-              <img src={market.icon} className="size-4 shrink-0" />
+              <img src={market.icon} className="size-4 shrink-0 rounded-full" />
             </div>
           </>
         )}
@@ -152,7 +152,10 @@ export const OrderCard = memo(function OrderCard(order: OrderCardProps) {
             <div>Collateral</div>
             <div>
               {collateral.amount.toFormat(4)}{" "}
-              <img src={collateral.icon} className="size-4 shrink-0" />
+              <img
+                src={collateral.icon}
+                className="size-4 shrink-0 rounded-full"
+              />
             </div>
           </>
         )}
@@ -214,7 +217,10 @@ export const OpenOrderButton = memo(function OpenOrderButton({
                   .toFormat(4)
               : "-"}
           </div>
-          <img src={order.collateral.icon} className="size-4 shrink-0" />
+          <img
+            src={order.collateral.icon}
+            className="size-4 shrink-0 rounded-full"
+          />
         </div>
         <DialogFooter>
           <DialogClose asChild>
@@ -349,28 +355,40 @@ export const FilledOrderButton = memo(function FilledOrderButton({
                     finalCoinBalance.toFormat(4)
                   )}
                 </div>
-                <img src={market.icon} className="size-4 shrink-0" />
+                <img
+                  src={market.icon}
+                  className="size-4 shrink-0 rounded-full"
+                />
               </div>
               <div className="flex items-center gap-2">
                 <div>Settled {market.ticker} Amount</div>
                 <div className="text-error ml-auto">
                   {order.collateral.amount.div(order.rate).toFormat(4)}
                 </div>
-                <img src={market.icon} className="size-4 shrink-0" />
+                <img
+                  src={market.icon}
+                  className="size-4 shrink-0 rounded-full"
+                />
               </div>
               <div className="flex items-center gap-2">
                 <div>Returned Collateral</div>
                 <div className="text-success ml-auto">
                   {order.collateral.amount.toFormat(4)}
                 </div>
-                <img src={order.collateral.icon} className="size-4 shrink-0" />
+                <img
+                  src={order.collateral.icon}
+                  className="size-4 shrink-0 rounded-full"
+                />
               </div>
               <div className="flex items-center gap-2">
                 <div>Proceeds</div>
                 <div className="text-success ml-auto">
                   {order.collateral.amount.toFormat(4)}
                 </div>
-                <img src={order.collateral.icon} className="size-4 shrink-0" />
+                <img
+                  src={order.collateral.icon}
+                  className="size-4 shrink-0 rounded-full"
+                />
               </div>
               <div className="flex items-center gap-2">
                 <div>Fee</div>
@@ -381,7 +399,10 @@ export const FilledOrderButton = memo(function FilledOrderButton({
                         .toFormat(4)
                     : "-"}
                 </div>
-                <img src={order.collateral.icon} className="size-4 shrink-0" />
+                <img
+                  src={order.collateral.icon}
+                  className="size-4 shrink-0 rounded-full"
+                />
               </div>
             </div>
             <DialogFooter>
@@ -458,14 +479,20 @@ export const FilledOrderButton = memo(function FilledOrderButton({
               <div className="text-success ml-auto">
                 {order.collateral.amount.toFormat(4)}
               </div>
-              <img src={order.collateral.icon} className="size-4 shrink-0" />
+              <img
+                src={order.collateral.icon}
+                className="size-4 shrink-0 rounded-full"
+              />
             </div>
             <div className="flex items-center gap-2">
               <div>Penalty</div>
               <div className="text-success ml-auto">
                 {order.collateral.amount.toFormat(4)}
               </div>
-              <img src={order.collateral.icon} className="size-4 shrink-0" />
+              <img
+                src={order.collateral.icon}
+                className="size-4 shrink-0 rounded-full"
+              />
             </div>
             <div className="flex items-center gap-2">
               <div>Fee</div>
@@ -474,7 +501,10 @@ export const FilledOrderButton = memo(function FilledOrderButton({
                   .multipliedBy(market.fee.penalty)
                   .toFormat(4)}
               </div>
-              <img src={order.collateral.icon} className="size-4 shrink-0" />
+              <img
+                src={order.collateral.icon}
+                className="size-4 shrink-0 rounded-full"
+              />
             </div>
           </div>
           <DialogFooter>
@@ -546,7 +576,10 @@ export const SettledOrderButton = memo(function SettledOrderButton({
           }}
         >
           Claim {order.balance.amount.toFormat(4)}{" "}
-          <img src={order.balance.icon} className="size-4 shrink-0" />
+          <img
+            src={order.balance.icon}
+            className="size-4 shrink-0 rounded-full"
+          />
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -562,7 +595,10 @@ export const SettledOrderButton = memo(function SettledOrderButton({
             <div className="text-success ml-auto">
               {order.balance.amount.toFormat(4)}
             </div>
-            <img src={order.balance.icon} className="size-4 shrink-0" />
+            <img
+              src={order.balance.icon}
+              className="size-4 shrink-0 rounded-full"
+            />
           </div>
         </div>
         <DialogFooter>

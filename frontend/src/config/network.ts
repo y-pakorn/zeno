@@ -1,6 +1,6 @@
 import { getFullnodeUrl } from "@mysten/sui/client"
 
-export const defaultNetwork = "mainnet"
+export const defaultNetwork = "devnet"
 
 // Config options for the networks you want to connect to
 export const networkConfig = {

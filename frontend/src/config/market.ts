@@ -6,12 +6,14 @@ export const preMarkets: { [key in Network]: PreMarket } = {
   mainnet: {
     id: "mainnet",
     packageId:
-      "0xdfc9db75d42dfb4980016d1c623a5f325881d647d96fb9ce962830aaf41a6dbf",
+      // "0xdfc9db75d42dfb4980016d1c623a5f325881d647d96fb9ce962830aaf41a6dbf",
+      "",
     marketId:
-      "0x00a44a9bf8ed5196f47c462cfe3edd03d6b55646c29101da9507328225ac3ae8",
+      // "0x00a44a9bf8ed5196f47c462cfe3edd03d6b55646c29101da9507328225ac3ae8",
+      "",
     name: "Walrus",
     ticker: "WAL",
-    icon: "https://img.cryptorank.io/coins/walrus1727864479768.png",
+    icon: "https://cdn.prod.website-files.com/66a8b39f3ac043de2548ab05/67a0d056287d0398a93668ee_logo_icon_w%20(1).svg",
     banner: "https://i.imgur.com/RMyEnky.png",
     isLive: true,
     totalSupply: 5_000_000_000, // 5 billion
@@ -56,7 +58,7 @@ export const preMarkets: { [key in Network]: PreMarket } = {
       "0x0f21634b863903e29c66a1aeefd42dfb747e46f6805699d3cfa69db538f05d96",
     name: "Walrus",
     ticker: "WAL",
-    icon: "https://img.cryptorank.io/coins/walrus1727864479768.png",
+    icon: "https://cdn.prod.website-files.com/66a8b39f3ac043de2548ab05/67a0d056287d0398a93668ee_logo_icon_w%20(1).svg",
     banner: "https://i.imgur.com/RMyEnky.png",
     isLive: true,
     totalSupply: 5_000_000_000, // 5 billion

@@ -59,7 +59,7 @@ export function AmountInput({
           <img
             src={token.icon}
             alt={token.ticker}
-            className="size-6 shrink-0"
+            className="size-6 shrink-0 rounded-full"
           />
         )}
       </div>
