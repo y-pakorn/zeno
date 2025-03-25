@@ -115,7 +115,7 @@ const Portfolio = memo(function Portfolio({}: { account: WalletAccount }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="lg" rounded="full">
-              {_.startCase(filters.status || "All Statuses")}
+              {_.startCase(filters.status || "All Status")}
               <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
@@ -127,7 +127,7 @@ const Portfolio = memo(function Portfolio({}: { account: WalletAccount }) {
                   setFilters({ ...filters, status: status as any })
                 }
               >
-                {_.startCase(status || "All Statuses")}
+                {_.startCase(status || "All Status")}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

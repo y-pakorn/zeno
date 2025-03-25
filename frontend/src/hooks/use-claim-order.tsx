@@ -23,7 +23,6 @@ export const useClaimOrder = () => {
         arguments: [
           txb.object(claimOrderParams.market.marketId),
           txb.pure.id(claimOrderParams.settledOrderId),
-          txb.object("0x6"),
         ],
         typeArguments: [claimOrderParams.market.resolution!.finalCoinType!],
       })

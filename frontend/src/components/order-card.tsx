@@ -303,12 +303,19 @@ export const FilledOrderButton = memo(function FilledOrderButton({
         disabled
         {...props}
       >
-        Settle in {dayjs(market.resolution.settlementStart).fromNow()}
+        Settle in {dayjs(market.resolution.settlementStart).fromNow(true)}
       </Button>
     )
 
   if (isSeller) {
     if (new Date() < market.resolution.deliveryBefore) {
+      const finalCoinBalance = new BigNumber(
+        balance.data?.totalBalance || 0
+      ).shiftedBy(-(market.resolution.exponent || 9))
+      const isInsufficientBalance = finalCoinBalance.lt(
+        order.collateral.amount.div(order.rate)
+      )
+
       return (
         <Dialog>
           <DialogTrigger asChild>
@@ -339,9 +346,7 @@ export const FilledOrderButton = memo(function FilledOrderButton({
                   {balance.isPending ? (
                     <Skeleton className="h-5 w-12" />
                   ) : (
-                    new BigNumber(balance.data?.totalBalance || 0)
-                      .shiftedBy(market.resolution.exponent || 9)
-                      .toFormat(4)
+                    finalCoinBalance.toFormat(4)
                   )}
                 </div>
                 <img src={market.icon} className="size-4 shrink-0" />
@@ -385,7 +390,7 @@ export const FilledOrderButton = memo(function FilledOrderButton({
               </DialogClose>
               <Button
                 variant="brand"
-                disabled={isSettling || isClosing}
+                disabled={isSettling || isClosing || isInsufficientBalance}
                 onClick={async () => {
                   await settleOrder({
                     market,
@@ -400,7 +405,9 @@ export const FilledOrderButton = memo(function FilledOrderButton({
                   setOpen(false)
                 }}
               >
-                {isSettling || isClosing ? (
+                {isInsufficientBalance ? (
+                  <>Insufficient Balance</>
+                ) : isSettling || isClosing ? (
                   <>
                     Settling <Loader2 className="animate-spin" />
                   </>
