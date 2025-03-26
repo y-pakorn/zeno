@@ -207,9 +207,19 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
       {
         header: "Price ($)",
         accessorKey: "price",
-        cell: ({ getValue }) => {
+        cell: ({ getValue, row }) => {
           const price = getValue<BigNumber>()
-          return <div className="font-medium">${formatBigNumber(price)}</div>
+          return (
+            <div
+              className={cn(
+                "font-medium",
+                row.original.type === "sell" && "text-success",
+                row.original.type === "buy" && "text-error"
+              )}
+            >
+              ${formatBigNumber(price)}
+            </div>
+          )
         },
       },
       {
@@ -298,11 +308,11 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
     <div className="grid max-h-full min-h-0 flex-1 grid-cols-2 gap-2">
       <DataTable
         className={cn(
-          filters.type !== "buy" ? "col-span-2" : "hidden",
+          filters.type !== "sell" ? "col-span-2" : "hidden",
           filters.type === "all" && "col-span-1"
         )}
         columns={columns}
-        data={sell}
+        data={buy}
         isLoadingSkeleton={openOrders.isFetching || openOrders.isPending}
         transparent
         rowClassName={(row) => {
@@ -313,11 +323,11 @@ const OfferTable = memo(function OfferTable({ filters }: { filters: Filter }) {
       />
       <DataTable
         className={cn(
-          filters.type !== "sell" ? "col-span-2" : "hidden",
+          filters.type !== "buy" ? "col-span-2" : "hidden",
           filters.type === "all" && "col-span-1"
         )}
         columns={columns}
-        data={buy}
+        data={sell}
         isLoadingSkeleton={openOrders.isFetching || openOrders.isPending}
         transparent
         rowClassName={(row) => {

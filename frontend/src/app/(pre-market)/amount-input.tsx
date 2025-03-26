@@ -47,7 +47,7 @@ export function AmountInput({
             !inputProps?.onChange && "pointer-events-none",
             inputProps?.className
           )}
-          defaultValue={value ? (isEstimated ? `≈${value}` : value) : undefined}
+          value={value ? (isEstimated ? `≈${value}` : value) : undefined}
           placeholder={placeholder}
           readOnly={!inputProps?.onChange}
           autoCorrect="off"
