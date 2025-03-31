@@ -1,11 +1,13 @@
 import { useSuiClient } from "@mysten/dapp-kit"
 import { QueryClient, useQuery, UseQueryOptions } from "@tanstack/react-query"
+import _ from "lodash"
 
 import { PreMarket } from "@/types/market"
 import {
   FilledOrder,
   OpenOrder,
   OrderCancelledEvent,
+  OrderFilledEvent,
   WithTransaction,
 } from "@/types/order"
 import { parseFilledOrderEvent, parseOpenOrderEvent } from "@/lib/contract"
@@ -61,6 +63,50 @@ export function useFilledOrderEvents({
           createdAt: new Date(Number(event.timestampMs)),
         },
       }))
+    },
+    ...props,
+  })
+}
+
+export function useMultiFilledOrderEvents({
+  markets,
+  ...props
+}: { markets: PreMarket[] } & Partial<
+  UseQueryOptions<WithTransaction<FilledOrder>[]>
+>) {
+  const client = useSuiClient()
+  return useQuery({
+    queryKey: [
+      "all-market-filled-orders-events",
+      markets.map((market) => market.id),
+    ],
+    queryFn: async () => {
+      const events = await client.queryEvents({
+        query: {
+          Any: markets.map((market) => ({
+            MoveEventType: `${market.packageId}::zeno::OrderFilled`,
+          })),
+        },
+        order: "descending",
+        limit: 1000,
+      })
+      return _.chain(events.data)
+        .map((event) => {
+          const eventData = event.parsedJson as OrderFilledEvent
+          const market = markets.find((m) => m.marketId === eventData.market_id)
+          if (!market) {
+            return null
+          }
+          return {
+            ...parseFilledOrderEvent(event, market),
+            transaction: {
+              hash: event.id.txDigest,
+              createdAt: new Date(Number(event.timestampMs)),
+            },
+          }
+        })
+        .compact()
+        .value()
     },
     ...props,
   })
