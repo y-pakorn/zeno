@@ -1,3 +1,5 @@
+"use client"
+
 import { useMemo } from "react"
 import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
@@ -11,9 +13,8 @@ import { formatAddress } from "@/lib/utils"
 import { useFilledOrderEvents } from "@/hooks/use-order-events"
 import { Badge } from "@/components/ui/badge"
 import { DataTable } from "@/components/data-table"
+import { useMarket } from "@/components/market-provider"
 import { useNetwork } from "@/components/wallet-provider"
-
-import { useMarket } from "./market-provider"
 
 export function RecentTransactionSection() {
   const { market, collateralPrices } = useMarket()
@@ -115,6 +116,24 @@ export function RecentTransactionSection() {
                 className="size-4"
               />
             </div>
+          )
+        },
+      },
+      {
+        header: "Tx Hash",
+        accessorKey: "transaction.hash",
+        cell: ({ getValue }) => {
+          const hash = getValue<string>()
+          return (
+            <Link
+              href={`${explorerUrl}/tx/${hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2"
+            >
+              <span className="max-w-16 truncate">{hash}</span>{" "}
+              <ExternalLink className="size-3" />
+            </Link>
           )
         },
       },

@@ -19,8 +19,8 @@ import { Icons } from "@/components/icons"
 import { OrderCard, OrderCardProps } from "@/components/order-card"
 import { WalletButton } from "@/components/wallet-button"
 
-import { useMarket } from "../market-provider"
-import { CollateralDisplay } from "../offer-section"
+import { useMarket } from "../../../components/market-provider"
+import { CollateralDisplay } from "../markets/[id]/offer-section"
 
 type Filter = {
   status?: "open" | "filled" | "settled"

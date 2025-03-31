@@ -45,6 +45,13 @@ export type FilledOrder = {
   filledAt: Date
 }
 
+export type WithTransaction<T> = T & {
+  transaction: {
+    createdAt: Date
+    hash: string
+  }
+}
+
 export type SettledOrder = {
   id: string
   claimer: string

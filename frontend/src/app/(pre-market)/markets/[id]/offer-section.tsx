@@ -1,3 +1,5 @@
+"use client"
+
 import { memo, useMemo, useState } from "react"
 import { useCurrentAccount } from "@mysten/dapp-kit"
 import { ColumnDef } from "@tanstack/react-table"
@@ -16,12 +18,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { useBook } from "@/components/book-provider"
 import { DataTable } from "@/components/data-table"
 import { EmptyState } from "@/components/empty-state"
-
-import { useBook } from "./book-provider"
-import { useMarket } from "./market-provider"
-import { useOrder } from "./order-provider"
+import { useMarket } from "@/components/market-provider"
+import { useOrder } from "@/components/order-provider"
 
 type Filter = {
   type: "buy" | "sell" | "all"

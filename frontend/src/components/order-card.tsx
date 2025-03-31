@@ -11,7 +11,7 @@ import { useCancelOrder } from "@/hooks/use-cancel-order"
 import { useClaimOrder } from "@/hooks/use-claim-order"
 import { useCloseOrder } from "@/hooks/use-close-order"
 import { useSettleOrder } from "@/hooks/use-settle-order"
-import { useMarket } from "@/app/(pre-market)/market-provider"
+import { useMarket } from "@/components/market-provider"
 
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"

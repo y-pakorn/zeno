@@ -54,9 +54,11 @@ export type MyOrders = {
 export const useMyOrders = ({
   market,
   onchainMarket,
+  enabled = true,
 }: {
   market: PreMarket
   onchainMarket?: OnchainMarket
+  enabled?: boolean
 }): MyOrders => {
   const account = useCurrentAccount()
 
@@ -71,7 +73,7 @@ export const useMyOrders = ({
     },
     {
       queryKey: ["order-owner-table-handle", market.id, account?.address],
-      enabled: !!onchainMarket?.orderOwnerTableId && !!account,
+      enabled: !!onchainMarket?.orderOwnerTableId && !!account && enabled,
       select: (data) => {
         const content = data.data?.content as any
         const orderHandle = content.fields.value.fields.order_ids.fields.id

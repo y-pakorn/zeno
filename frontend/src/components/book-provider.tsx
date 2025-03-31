@@ -1,3 +1,5 @@
+"use client"
+
 import { createContext, useContext, useMemo } from "react"
 import { UseQueryResult } from "@tanstack/react-query"
 import BigNumber from "bignumber.js"

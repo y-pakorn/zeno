@@ -18,12 +18,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useBook } from "@/components/book-provider"
+import { useMarket } from "@/components/market-provider"
+import { useNetwork } from "@/components/wallet-provider"
 
 import { AmountInput } from "./amount-input"
-import { useBook } from "./book-provider"
-import { useMarket } from "./market-provider"
 
 export function MakerOrder() {
+  const { network } = useNetwork()
+
   const { market, collateralPrices } = useMarket()
   const { offers } = useBook()
   const { mutateAsync: createOrder, isPending: isCreatingOrder } =
@@ -309,54 +312,61 @@ export function MakerOrder() {
               variant: "active",
               children: "Please Connect Wallet",
             }
-          : market.resolution && new Date() > market.resolution.settlementStart
+          : network !== market.network
             ? {
                 disabled: true,
                 variant: "active",
-                children: "Market Closed",
+                children: `Wrong Network, Switch to ${_.startCase(market.network)}`,
               }
-            : _.size(errors) > 0
+            : market.resolution &&
+                new Date() > market.resolution.settlementStart
               ? {
                   disabled: true,
-                  variant: "destructive",
-                  children: _.chain(errors).values().last().value().message,
+                  variant: "active",
+                  children: "Market Closed",
                 }
-              : result &&
-                  collateral &&
-                  new BigNumber(balance?.data?.totalBalance || "0")
-                    .shiftedBy(-collateral.exponent)
-                    .lt(result.collateralAmount)
+              : _.size(errors) > 0
                 ? {
                     disabled: true,
                     variant: "destructive",
-                    children: "Insufficient Balance",
+                    children: _.chain(errors).values().last().value().message,
                   }
-                : {
-                    disabled: isCreatingOrder,
-                    variant: "brand",
-                    onClick: async () => {
-                      await createOrder({
-                        market,
-                        type: type as "buy" | "sell",
-                        rate: result!.pricePerToken!.pow(-1),
-                        collateral: {
-                          amount: result!.collateralAmount,
-                          coinType: collateralCoinType!,
-                          exponent: collateral!.exponent,
-                        },
-                      })
-                      balance.refetch()
-                      reset()
-                    },
-                    children: isCreatingOrder ? (
-                      <>
-                        Creating...
-                        <Loader2 className="size-4 animate-spin" />
-                      </>
-                    ) : (
-                      `Create ${_.startCase(type)} Offer`
-                    ),
-                  })}
+                : result &&
+                    collateral &&
+                    new BigNumber(balance?.data?.totalBalance || "0")
+                      .shiftedBy(-collateral.exponent)
+                      .lt(result.collateralAmount)
+                  ? {
+                      disabled: true,
+                      variant: "destructive",
+                      children: "Insufficient Balance",
+                    }
+                  : {
+                      disabled: isCreatingOrder,
+                      variant: "brand",
+                      onClick: async () => {
+                        await createOrder({
+                          market,
+                          type: type as "buy" | "sell",
+                          rate: result!.pricePerToken!.pow(-1),
+                          collateral: {
+                            amount: result!.collateralAmount,
+                            coinType: collateralCoinType!,
+                            exponent: collateral!.exponent,
+                          },
+                        })
+                        balance.refetch()
+                        reset()
+                      },
+                      children: isCreatingOrder ? (
+                        <>
+                          Creating...
+                          <Loader2 className="size-4 animate-spin" />
+                        </>
+                      ) : (
+                        `Create ${_.startCase(type)} Offer`
+                      ),
+                    })}
       />
       {result && tokenAmount && collateral && pricePerTokenUsd && (
         <>

@@ -1,14 +1,18 @@
 import BigNumber from "bignumber.js"
 
+import { Network } from "@/config/network"
+
+export type Market = PreMarket | UpcomingMarket
+
 export type PreMarket = {
+  network: Network
   id: string
   marketId: string
   packageId: string
   name: string
   ticker: string
   icon: string
-  banner?: string
-  isLive: boolean
+  status: "live"
   totalSupply: number
   collaterals: Collateral[]
   resolution?: Resolution
@@ -18,6 +22,20 @@ export type PreMarket = {
     website?: string
   }
   fee: MarketFee
+}
+
+export type UpcomingMarket = {
+  network: Network
+  id: string
+  name: string
+  ticker: string
+  icon: string
+  status: "upcoming"
+  links?: {
+    twitter?: string
+    discord?: string
+    website?: string
+  }
 }
 
 export type MarketFee = {

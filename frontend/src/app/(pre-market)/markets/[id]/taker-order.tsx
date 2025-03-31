@@ -1,21 +1,26 @@
+"use client"
+
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit"
 import BigNumber from "bignumber.js"
+import _ from "lodash"
 import { match, P } from "ts-pattern"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useMarket } from "@/components/market-provider"
+import { useOrder } from "@/components/order-provider"
+import { useNetwork } from "@/components/wallet-provider"
 
 import { AmountInput } from "./amount-input"
-import { useMarket } from "./market-provider"
-import { useOrder } from "./order-provider"
 
 export function TakerOrder() {
+  const { network } = useNetwork()
+
   const { market } = useMarket()
   const { selectedOrderIds, unselectAllOrders, selected, fillOrder } =
     useOrder()
-
   const address = useCurrentAccount()
   const balance = useSuiClientQuery(
     "getBalance",
@@ -76,94 +81,56 @@ export function TakerOrder() {
           }
         />
       </Tabs>
-      {match({
-        connected: !!address,
-        selected,
-        isInsufficientBalance:
-          balance.data?.totalBalance &&
-          selected?.exponent &&
-          new BigNumber(balance.data.totalBalance)
-            .shiftedBy(-selected.exponent)
-            .lt(selected.totalCollateralAmount),
-        closed:
-          market.resolution && new Date() > market.resolution.settlementStart,
-      })
-        .with(
-          P.union(
-            {
-              connected: false,
-            },
-            {
-              connected: true,
-              selected: P.nullish,
-            },
-            {
-              connected: true,
-              closed: true,
+      <Button
+        size="lg"
+        rounded="full"
+        className="w-full"
+        {...(!address
+          ? {
+              disabled: true,
+              variant: "active",
+              children: "Please Connect Wallet",
             }
-          ),
-          ({ connected, closed }) => {
-            return (
-              <Button
-                variant="active"
-                disabled
-                size="lg"
-                className="w-full"
-                rounded="full"
-              >
-                {connected
-                  ? closed
-                    ? "Market Closed"
-                    : "Select Order First"
-                  : "Please Connect Wallet"}
-              </Button>
-            )
-          }
-        )
-        .with(
-          {
-            connected: true,
-            isInsufficientBalance: true,
-          },
-          () => {
-            return (
-              <Button
-                variant="destructive"
-                disabled
-                size="lg"
-                className="w-full"
-                rounded="full"
-              >
-                Insufficient Balance
-              </Button>
-            )
-          }
-        )
-        .with(
-          {
-            connected: true,
-            selected: P.select(),
-          },
-          ({ ...selected }) => {
-            return (
-              <Button
-                variant="brand"
-                size="lg"
-                className="w-full"
-                rounded="full"
-                onClick={async () => {
-                  await fillOrder.mutateAsync()
-                  balance.refetch()
-                  unselectAllOrders()
-                }}
-                disabled={fillOrder.isPending}
-              >
-                {selected.type === "buy" ? "Sell" : "Buy"}
-              </Button>
-            )
-          }
-        )
-        .exhaustive()}
+          : network !== market.network
+            ? {
+                disabled: true,
+                variant: "active",
+                children: `Wrong Network, Switch to ${_.startCase(market.network)}`,
+              }
+            : market.resolution &&
+                new Date() > market.resolution.settlementStart
+              ? {
+                  disabled: true,
+                  variant: "active",
+                  children: "Market Closed",
+                }
+              : !selected
+                ? {
+                    disabled: true,
+                    variant: "active",
+                    children: "Select Order First",
+                  }
+                : balance.data?.totalBalance &&
+                    selected.exponent &&
+                    new BigNumber(balance.data.totalBalance)
+                      .shiftedBy(-selected.exponent)
+                      .lt(selected.totalCollateralAmount)
+                  ? {
+                      disabled: true,
+                      variant: "destructive",
+                      children: "Insufficient Balance",
+                    }
+                  : {
+                      variant: "brand",
+                      disabled: fillOrder.isPending,
+                      onClick: async () => {
+                        await fillOrder.mutateAsync()
+                        balance.refetch()
+                        unselectAllOrders()
+                      },
+                      children: selected.type === "buy" ? "Sell" : "Buy",
+                    })}
+      />
       {selected && (
         <>
           <div className="text-muted-foreground text-sm font-medium">

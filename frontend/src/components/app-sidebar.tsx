@@ -31,8 +31,7 @@ const items = [
       {
         label: "Home",
         icon: Home,
-        href: "/home",
-        disabled: true,
+        href: "/",
       },
     ],
   },
@@ -42,7 +41,7 @@ const items = [
       {
         label: "Pre-Market",
         icon: KanbanSquare,
-        href: "/",
+        href: "/markets",
         className: "-rotate-90",
         // matchFn: (pathname) => pathname.startsWith("/pre-market"),
       },

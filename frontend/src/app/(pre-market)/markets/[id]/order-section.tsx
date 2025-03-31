@@ -1,16 +1,18 @@
+"use client"
+
 import { useEffect, useMemo, useState } from "react"
 import _ from "lodash"
-import { Bookmark, ChevronLeft, Loader2, Plus } from "lucide-react"
+import { Bookmark, ChevronLeft, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { EmptyState } from "@/components/empty-state"
+import { useMarket } from "@/components/market-provider"
 import { OrderCard } from "@/components/order-card"
+import { useOrder } from "@/components/order-provider"
 
 import { MakerOrder } from "./maker-order"
-import { useMarket } from "./market-provider"
-import { useOrder } from "./order-provider"
 import { TakerOrder } from "./taker-order"
 
 export const ORDER_SECTION_WIDTH = "330px"

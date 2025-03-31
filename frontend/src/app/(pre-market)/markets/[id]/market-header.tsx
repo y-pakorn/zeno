@@ -1,3 +1,5 @@
+"use client"
+
 import { useMemo } from "react"
 import Link from "next/link"
 import BigNumber from "bignumber.js"
@@ -9,9 +11,8 @@ import { useFilledOrderEvents } from "@/hooks/use-order-events"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-
-import { useBook } from "./book-provider"
-import { useMarket } from "./market-provider"
+import { useBook } from "@/components/book-provider"
+import { useMarket } from "@/components/market-provider"
 
 export function MarketHeader() {
   const { market, collateralPrices, onchainMarket } = useMarket()
@@ -72,8 +73,8 @@ export function MarketHeader() {
       />
       <div className="-ml-2">
         <div className="text-lg font-bold">{market.ticker}</div>
-        <Badge variant={market.isLive ? "success" : "error"}>
-          {market.isLive ? "LIVE" : "UPCOMING"}
+        <Badge variant={market.status === "live" ? "success" : "error"}>
+          {_.startCase(market.status)}
         </Badge>
       </div>
       <div className="ml-8">

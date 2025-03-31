@@ -1,9 +1,6 @@
+"use client"
+
 import { createContext, useContext, useMemo, useState } from "react"
-import {
-  useCurrentAccount,
-  useSuiClient,
-  useSuiClientQuery,
-} from "@mysten/dapp-kit"
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 import BigNumber from "bignumber.js"
 import _, { filter } from "lodash"
@@ -38,13 +35,15 @@ export const useMarket = () => {
   return data
 }
 
-export const MarketProvider = ({ children }: { children: React.ReactNode }) => {
-  const { network } = useNetwork()
-
-  const market = useMemo(() => {
-    return preMarkets[network]
-  }, [network])
-
+export const MarketProvider = ({
+  market,
+  children,
+  queryMyOrders = true,
+}: {
+  market: PreMarket
+  children: React.ReactNode
+  queryMyOrders?: boolean
+}) => {
   const onchainMarket = useOnchainMarket({
     market,
   })
@@ -52,6 +51,7 @@ export const MarketProvider = ({ children }: { children: React.ReactNode }) => {
   const myOrders = useMyOrders({
     market,
     onchainMarket: onchainMarket.data,
+    enabled: queryMyOrders,
   })
 
   const collateralPrices = useCollateralPrices({

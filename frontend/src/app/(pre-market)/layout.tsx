@@ -1,6 +1,5 @@
 "use client"
 
-import { headers } from "next/headers"
 import Link from "next/link"
 import { FaXTwitter } from "react-icons/fa6"
 
@@ -9,8 +8,6 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/empty-state"
 import { Icons } from "@/components/icons"
-
-import { MarketProvider } from "./market-provider"
 
 export default function PreMarketLayout({
   children,
@@ -46,5 +43,5 @@ export default function PreMarketLayout({
     )
   }
 
-  return <MarketProvider>{children}</MarketProvider>
+  return children
 }

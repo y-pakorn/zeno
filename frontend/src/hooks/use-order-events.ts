@@ -2,13 +2,20 @@ import { useSuiClient } from "@mysten/dapp-kit"
 import { QueryClient, useQuery, UseQueryOptions } from "@tanstack/react-query"
 
 import { PreMarket } from "@/types/market"
-import { FilledOrder, OpenOrder, OrderCancelledEvent } from "@/types/order"
+import {
+  FilledOrder,
+  OpenOrder,
+  OrderCancelledEvent,
+  WithTransaction,
+} from "@/types/order"
 import { parseFilledOrderEvent, parseOpenOrderEvent } from "@/lib/contract"
 
 export function useOpenOrderEvents({
   market,
   ...props
-}: { market: PreMarket } & Partial<UseQueryOptions<OpenOrder[]>>) {
+}: { market: PreMarket } & Partial<
+  UseQueryOptions<WithTransaction<OpenOrder>[]>
+>) {
   const client = useSuiClient()
   return useQuery({
     queryKey: ["open-orders-events", market.id],
@@ -19,7 +26,13 @@ export function useOpenOrderEvents({
         },
         order: "descending",
       })
-      return events.data.map((event) => parseOpenOrderEvent(event, market))
+      return events.data.map((event) => ({
+        ...parseOpenOrderEvent(event, market),
+        transaction: {
+          hash: event.id.txDigest,
+          createdAt: new Date(Number(event.timestampMs)),
+        },
+      }))
     },
     ...props,
   })
@@ -28,7 +41,9 @@ export function useOpenOrderEvents({
 export function useFilledOrderEvents({
   market,
   ...props
-}: { market: PreMarket } & Partial<UseQueryOptions<FilledOrder[]>>) {
+}: { market: PreMarket } & Partial<
+  UseQueryOptions<WithTransaction<FilledOrder>[]>
+>) {
   const client = useSuiClient()
   return useQuery({
     queryKey: ["filled-orders-events", market.id],
@@ -39,7 +54,13 @@ export function useFilledOrderEvents({
         },
         order: "descending",
       })
-      return events.data.map((event) => parseFilledOrderEvent(event, market))
+      return events.data.map((event) => ({
+        ...parseFilledOrderEvent(event, market),
+        transaction: {
+          hash: event.id.txDigest,
+          createdAt: new Date(Number(event.timestampMs)),
+        },
+      }))
     },
     ...props,
   })
@@ -48,7 +69,9 @@ export function useFilledOrderEvents({
 export function useCancelledOrderEvents({
   market,
   ...props
-}: { market: PreMarket } & Partial<UseQueryOptions<OrderCancelledEvent[]>>) {
+}: { market: PreMarket } & Partial<
+  UseQueryOptions<WithTransaction<OrderCancelledEvent>[]>
+>) {
   const client = useSuiClient()
   return useQuery({
     queryKey: ["cancelled-orders-events", market.id],
@@ -60,7 +83,13 @@ export function useCancelledOrderEvents({
         order: "descending",
       })
       return events.data
-        .map((event) => event.parsedJson as OrderCancelledEvent)
+        .map((event) => ({
+          ...(event.parsedJson as OrderCancelledEvent),
+          transaction: {
+            hash: event.id.txDigest,
+            createdAt: new Date(Number(event.timestampMs)),
+          },
+        }))
         .filter((event) => event.market_id === market.marketId)
     },
     ...props,

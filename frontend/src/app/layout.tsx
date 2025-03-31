@@ -96,7 +96,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body
         className={cn(
           "bg-background font-heading min-h-screen antialiased",
-          // body.variable,
+          heading.className,
           heading.variable
         )}
       >

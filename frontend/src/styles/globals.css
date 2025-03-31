@@ -6,7 +6,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-body: "Instrument Sans";
   --font-heading: var(--font-heading);
 
   --color-border: hsl(var(--border));
