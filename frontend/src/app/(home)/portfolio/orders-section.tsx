@@ -1,12 +1,11 @@
-"use client"
-
 import { memo, useMemo, useState } from "react"
 import { useCurrentAccount } from "@mysten/dapp-kit"
 import { WalletAccount } from "@mysten/wallet-standard"
 import _ from "lodash"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, Loader2 } from "lucide-react"
 import { match } from "ts-pattern"
 
+import { PreMarket } from "@/types/market"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/empty-state"
 import { Icons } from "@/components/icons"
 import { OrderCard, OrderCardProps } from "@/components/order-card"
@@ -28,25 +28,7 @@ type Filter = {
   fillType?: "full" | "partial"
 }
 
-export default function PortfolioPage() {
-  const account = useCurrentAccount()
-
-  if (!account) {
-    return (
-      <EmptyState
-        icon={Icons.walletMissing}
-        header="Wallet Not Connected"
-        description="You need to connect your wallet to view your portfolio"
-      >
-        <WalletButton className="mt-2" />
-      </EmptyState>
-    )
-  }
-
-  return <Portfolio account={account} />
-}
-
-const Portfolio = memo(function Portfolio({}: { account: WalletAccount }) {
+export const OrdersSection = memo(function OrdersSection() {
   const { myOrders, market } = useMarket()
 
   const orders = useMemo(() => {
@@ -82,6 +64,20 @@ const Portfolio = memo(function Portfolio({}: { account: WalletAccount }) {
     myOrders.settledOrders.data,
   ])
 
+  const isLoading = useMemo(
+    () =>
+      _.every([
+        myOrders.filledOrders.isPending,
+        myOrders.openOrders.isPending,
+        myOrders.settledOrders.isPending,
+      ]),
+    [
+      myOrders.filledOrders.isLoading,
+      myOrders.openOrders.isLoading,
+      myOrders.settledOrders.isLoading,
+    ]
+  )
+
   const [filters, setFilters] = useState<Filter>({
     status: undefined,
     collateral: undefined,
@@ -101,9 +97,22 @@ const Portfolio = memo(function Portfolio({}: { account: WalletAccount }) {
       .value()
   }, [orders, filters])
 
+  if (isLoading) {
+    return (
+      <div className="grid gap-2 py-4 md:grid-cols-3 xl:grid-cols-4">
+        {_.range(6).map((i) => (
+          <Skeleton key={i} className="h-[180px] w-full" />
+        ))}
+      </div>
+    )
+  }
+
+  if (orders.length === 0) {
+    return
+  }
+
   return (
     <div className="space-y-2 py-4">
-      <h1 className="text-2xl font-bold">Activity</h1>
       <div className="flex items-center gap-4">
         <img
           src={market.icon}

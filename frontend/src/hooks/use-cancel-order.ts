@@ -1,4 +1,4 @@
-import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit"
+import { useCurrentAccount } from "@mysten/dapp-kit"
 import { Transaction } from "@mysten/sui/transactions"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import _ from "lodash"

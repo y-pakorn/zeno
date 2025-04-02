@@ -13,6 +13,7 @@ export type PreMarket = {
   ticker: string
   icon: string
   status: "live"
+  featured?: boolean
   totalSupply: number
   collaterals: Collateral[]
   resolution?: Resolution
@@ -31,6 +32,7 @@ export type UpcomingMarket = {
   ticker: string
   icon: string
   status: "upcoming"
+  featured?: boolean
   links?: {
     twitter?: string
     discord?: string

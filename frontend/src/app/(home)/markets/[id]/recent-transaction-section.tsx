@@ -9,7 +9,7 @@ import _ from "lodash"
 import { ExternalLink } from "lucide-react"
 
 import { FilledOrder } from "@/types/order"
-import { formatAddress } from "@/lib/utils"
+import { cn, formatAddress } from "@/lib/utils"
 import { useFilledOrderEvents } from "@/hooks/use-order-events"
 import { Badge } from "@/components/ui/badge"
 import { DataTable } from "@/components/data-table"
@@ -148,8 +148,8 @@ export function RecentTransactionSection() {
         columns={columns}
         data={filledOrders || []}
         isLoadingSkeleton={isLoading}
-        transparent
         skeletonCount={10}
+        rowClassName={() => cn("h-12")}
       />
     </div>
   )

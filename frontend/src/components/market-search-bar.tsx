@@ -6,9 +6,9 @@ import _ from "lodash"
 import { ArrowRight, ArrowUpRight, ChevronsUpDown, Search } from "lucide-react"
 
 import { markets } from "@/config/market"
+import { cn } from "@/lib/utils"
 
 import { Badge } from "./ui/badge"
-import { Button } from "./ui/button"
 import {
   Command,
   CommandDialog,
@@ -20,10 +20,12 @@ import {
   CommandSeparator,
 } from "./ui/command"
 import { Input } from "./ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { useNetwork } from "./wallet-provider"
 
-export function MarketSearchBar() {
+export function MarketSearchBar({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   const [open, setOpen] = useState(false)
 
   const { network } = useNetwork()
@@ -47,12 +49,13 @@ export function MarketSearchBar() {
   return (
     <>
       <div
-        className="relative w-full max-w-[250px]"
+        className={cn("relative w-full max-w-[250px]", className)}
         onClick={() => setOpen(true)}
+        {...props}
       >
         <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
         <Input
-          className="cursor-pointer rounded-full pr-8 pl-8"
+          className="bg-background cursor-pointer rounded-full pr-8 pl-8"
           placeholder="Search for a market"
           readOnly
         />

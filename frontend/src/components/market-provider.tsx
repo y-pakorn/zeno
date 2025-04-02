@@ -7,7 +7,6 @@ import _, { filter } from "lodash"
 
 import { OnchainMarket, PreMarket } from "@/types/market"
 import { Offer, OpenOrder } from "@/types/order"
-import { preMarkets } from "@/config/market"
 import { useCollateralPrices } from "@/hooks/use-collateral-prices"
 import { MyOrders, useMyOrders } from "@/hooks/use-my-orders"
 import { useOnchainMarket } from "@/hooks/use-onchain-market"

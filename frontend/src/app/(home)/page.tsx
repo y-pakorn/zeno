@@ -3,10 +3,13 @@ import { ArrowRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
+import { AllEvents } from "./all-events"
+import { NewListings } from "./new-listings"
+
 export default function Home() {
   return (
-    <div className="space-y-4 py-4">
-      <div className="grid gap-4 md:grid-cols-2">
+    <div className="space-y-8 py-4">
+      <div className="grid gap-4 py-8 md:grid-cols-2">
         <div className="space-y-4">
           <h1 className="font-heading text-5xl font-bold">
             Trade Pre-Market Crypto Assets on{" "}
@@ -23,6 +26,8 @@ export default function Home() {
           </Link>
         </div>
       </div>
+      <NewListings />
+      <AllEvents />
     </div>
   )
 }

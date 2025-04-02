@@ -11,8 +11,13 @@ import { OfferSection } from "./offer-section"
 import { OrderSection } from "./order-section"
 import { RecentTransactionSection } from "./recent-transaction-section"
 
-export function generateMetadata({ params }: { params: { id: string } }) {
-  const market = markets.find((market) => market.id === params.id)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const market = markets.find((market) => market.id === id)
   if (!market) {
     return {
       title: "Market not found",
@@ -23,8 +28,13 @@ export function generateMetadata({ params }: { params: { id: string } }) {
   }
 }
 
-export default function MarketPage({ params }: { params: { id: string } }) {
-  const market = markets.find((market) => market.id === params.id)
+export default async function MarketPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const market = markets.find((market) => market.id === id)
 
   if (!market) {
     return (

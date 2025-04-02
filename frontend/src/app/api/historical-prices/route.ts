@@ -3,17 +3,21 @@ import { EventId, SuiClient } from "@mysten/sui/client"
 import BigNumber from "bignumber.js"
 import _ from "lodash"
 
-import { preMarkets } from "@/config/market"
+import { markets } from "@/config/market"
 import { Network, networkConfig } from "@/config/network"
+
+export const revalidate = 900 // 15 minutes
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
 
-  const network = networkConfig[searchParams.get("network") as Network]
-  if (!network)
-    return NextResponse.json({ error: "Invalid network" }, { status: 400 })
+  const market = markets.find((market) => market.id === searchParams.get("id"))
+  if (!market)
+    return NextResponse.json({ error: "Invalid market" }, { status: 400 })
+  if (market.status !== "live")
+    return NextResponse.json({ error: "Market is not live" }, { status: 400 })
 
-  const market = preMarkets[network.name]
+  const network = networkConfig[market.network]
   const collateralMap = _.keyBy(market.collaterals, "coinType")
   const client = new SuiClient({ url: network.url })
 
@@ -102,5 +106,8 @@ export async function GET(request: NextRequest) {
     ])
   }
 
-  return NextResponse.json(result)
+  return NextResponse.json({
+    data: result,
+    timestamp: new Date().toISOString(),
+  })
 }

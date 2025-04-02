@@ -19,7 +19,7 @@ export function AppNavbar({
       style={{ height: NAVBAR_HEIGHT }}
       {...props}
     >
-      <MarketSearchBar />
+      <MarketSearchBar className="hidden md:flex" />
       <div className="flex-1" />
       <NetworkButton />
       <WalletButton />

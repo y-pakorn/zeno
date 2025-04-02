@@ -152,3 +152,22 @@ export type OrderCancelledEvent = {
   market_id: string
   order_id: string
 }
+
+export type AllEventItem = {
+  market: {
+    icon: string
+    ticker: string
+    id: string
+  }
+  collateral: {
+    icon: string
+    ticker: string
+    amount: string
+  }
+  type: "buy" | "sell"
+  rate: string
+  transaction: {
+    hash: string
+    createdAt: string
+  }
+}

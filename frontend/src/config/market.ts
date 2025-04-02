@@ -84,7 +84,7 @@ export const markets: Market[] = [
       "0x0f21634b863903e29c66a1aeefd42dfb747e46f6805699d3cfa69db538f05d96",
     name: "Walrus",
     ticker: "WAL",
-    icon: "https://cdn.prod.website-files.com/66a8b39f3ac043de2548ab05/67a0d056287d0398a93668ee_logo_icon_w%20(1).svg",
+    icon: "https://s2.coinmarketcap.com/static/img/coins/200x200/36119.png",
     status: "live",
     totalSupply: 5_000_000_000, // 5 billion
     links: {

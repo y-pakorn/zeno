@@ -7,11 +7,13 @@ export const networkConfig = {
   mainnet: {
     name: "mainnet",
     url: getFullnodeUrl("mainnet"),
+    graphql: "https://sui-mainnet.mystenlabs.com/graphql",
     explorerUrl: "https://suiscan.xyz",
   },
   devnet: {
     name: "devnet",
     url: getFullnodeUrl("devnet"),
+    graphql: "https://sui-devnet.mystenlabs.com/graphql",
     explorerUrl: "https://suiscan.xyz/devnet",
   },
 } as const

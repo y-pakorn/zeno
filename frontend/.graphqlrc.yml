@@ -1,0 +1,4 @@
+schema:
+  - sui/crates/sui-graphql-rpc/schema.graphql
+documents:
+  - src/**/*.{graphql,js,ts,jsx,tsx}
