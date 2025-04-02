@@ -34,66 +34,65 @@ export function MakerOrder() {
 
   const formSchema = useMemo(
     () =>
-      z
-        .object({
-          type: z.enum(["buy", "sell"]),
-          pricePerToken: z
-            .string()
-            .min(1, "Price is required")
-            .transform((v, ctx) => {
-              const pricePerToken = new BigNumber(v)
-              if (pricePerToken.lte(0)) {
-                ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: "Invalid price",
-                })
-                return z.NEVER
-              }
-              return pricePerToken
-            }),
-          tokenAmount: z
-            .string()
-            .min(1, "Amount is required")
-            .transform((v, ctx) => {
-              const tokenAmount = new BigNumber(v)
-              if (tokenAmount.lte(0)) {
-                ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: "Invalid amount",
-                })
-                return z.NEVER
-              }
-              return tokenAmount
-            }),
-          collateralCoinType: z
-            .string()
-            .refine((v) => market.collaterals.some((c) => c.coinType === v), {
-              message: "Invalid collateral",
-            }),
-        })
-        .refine(
-          (data) => {
-            // check if the order price is better than the best offer
-            if (data.type === "buy") {
-              const buyOffers = _.chain(offers)
-                .filter((o) => o.type === "sell")
-                .value()
-              return buyOffers.length > 0
-                ? buyOffers.some((o) => o.price.gte(data.pricePerToken))
-                : true
+      z.object({
+        type: z.enum(["buy", "sell"]),
+        pricePerToken: z
+          .string()
+          .min(1, "Price is required")
+          .transform((v, ctx) => {
+            const pricePerToken = new BigNumber(v)
+            if (pricePerToken.lte(0)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Invalid price",
+              })
+              return z.NEVER
             }
-            const sellOffers = _.chain(offers)
-              .filter((o) => o.type === "buy")
-              .value()
-            return sellOffers.length > 0
-              ? sellOffers.some((o) => o.price.lte(data.pricePerToken))
-              : true
-          },
-          {
-            path: ["pricePerToken"],
-            message: "Price is worse than the best offer",
-          }
-        ),
+            return pricePerToken
+          }),
+        tokenAmount: z
+          .string()
+          .min(1, "Amount is required")
+          .transform((v, ctx) => {
+            const tokenAmount = new BigNumber(v)
+            if (tokenAmount.lte(0)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Invalid amount",
+              })
+              return z.NEVER
+            }
+            return tokenAmount
+          }),
+        collateralCoinType: z
+          .string()
+          .refine((v) => market.collaterals.some((c) => c.coinType === v), {
+            message: "Invalid collateral",
+          }),
+      }),
+    // .refine(
+    //   (data) => {
+    //     // check if the order price is better than the best offer
+    //     if (data.type === "buy") {
+    //       const buyOffers = _.chain(offers)
+    //         .filter((o) => o.type === "sell")
+    //         .value()
+    //       return buyOffers.length > 0
+    //         ? buyOffers.some((o) => o.price.gte(data.pricePerToken))
+    //         : true
+    //     }
+    //     const sellOffers = _.chain(offers)
+    //       .filter((o) => o.type === "buy")
+    //       .value()
+    //     return sellOffers.length > 0
+    //       ? sellOffers.some((o) => o.price.lte(data.pricePerToken))
+    //       : true
+    //   },
+    //   {
+    //     path: ["pricePerToken"],
+    //     message: "Price is worse than the best offer",
+    //   }
+    // ),
     [market.collaterals, offers]
   )
 
@@ -143,6 +142,7 @@ export function MakerOrder() {
       coinType: collateralCoinType,
     },
     {
+      refetchInterval: 20 * 1000, // 20 seconds
       enabled: !!address && !!collateralCoinType,
     }
   )

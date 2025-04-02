@@ -16,7 +16,10 @@ export function useCollateralPrices({
   market: PreMarket
 } & Partial<UseQueryOptions<CollateralPrices>>) {
   return useQuery<CollateralPrices>({
-    queryKey: ["collateral-prices", market.id],
+    queryKey: [
+      "collateral-prices",
+      _.chain(market.collaterals).map("pythId").sort().value(),
+    ],
     queryFn: async () => {
       const prices = await connection
         .getLatestPriceUpdates(

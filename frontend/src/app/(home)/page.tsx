@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 
 import { AllEvents } from "./all-events"
 import { NewListings } from "./new-listings"
+import { UpcomingMarkets } from "./upcoming-markets"
 
 export default function Home() {
   return (
@@ -27,6 +28,7 @@ export default function Home() {
         </div>
       </div>
       <NewListings />
+      <UpcomingMarkets />
       <AllEvents />
     </div>
   )

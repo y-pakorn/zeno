@@ -9,6 +9,8 @@ export type PreMarket = {
   id: string
   marketId: string
   packageId: string
+  adminCap: string
+  upgradeCap: string
   name: string
   ticker: string
   icon: string
@@ -32,7 +34,6 @@ export type UpcomingMarket = {
   ticker: string
   icon: string
   status: "upcoming"
-  featured?: boolean
   links?: {
     twitter?: string
     discord?: string

@@ -7,7 +7,7 @@ import _ from "lodash"
 import numbro from "numbro"
 import { FaDiscord, FaGlobe, FaXTwitter } from "react-icons/fa6"
 
-import { useFilledOrderEvents } from "@/hooks/use-order-events"
+import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -15,41 +15,8 @@ import { useBook } from "@/components/book-provider"
 import { useMarket } from "@/components/market-provider"
 
 export function MarketHeader() {
-  const { market, collateralPrices, onchainMarket } = useMarket()
+  const { market, collateralPrices, stats } = useMarket()
   const { openOrders } = useBook()
-
-  const filledOrders = useFilledOrderEvents({
-    market,
-  })
-
-  const isLatestPriceLoading =
-    filledOrders.isPending || collateralPrices.isPending
-  const latestPrice = useMemo(() => {
-    if (!filledOrders.data?.length) return null
-    const lastFilledOrder = filledOrders.data[0]
-    const price = lastFilledOrder.rate.multipliedBy(
-      collateralPrices.data?.[lastFilledOrder.collateral.coinType] || 0
-    )
-    return price
-  }, [filledOrders.data, collateralPrices.data])
-
-  const isTotalVolumeLoading =
-    onchainMarket.isPending || collateralPrices.isPending
-  const totalVolume = useMemo(() => {
-    if (!onchainMarket.data) return null
-    return _.chain(onchainMarket.data.collateral)
-      .entries()
-      .reduce(
-        (acc, [coinType, collateral]) =>
-          acc.plus(
-            collateral.volumeFilled.multipliedBy(
-              collateralPrices.data?.[coinType] || 0
-            )
-          ),
-        new BigNumber(0)
-      )
-      .value()
-  }, [onchainMarket, collateralPrices.data])
 
   const isOpenInterestLoading = openOrders.isPending || openOrders.isPending
   const openInterest = useMemo(() => {
@@ -78,23 +45,38 @@ export function MarketHeader() {
         </Badge>
       </div>
       <div className="ml-8">
-        <div className="text-lg font-bold">
-          {isLatestPriceLoading ? (
-            <Skeleton key="loading" className="h-8 w-12" />
-          ) : latestPrice ? (
-            <span key="price">${latestPrice.toFormat(2)}</span>
-          ) : (
-            <span key="empty">-</span>
-          )}
+        <div>
+          <div className="text-lg font-bold">
+            {stats.isLoadingLastPrice ? (
+              <Skeleton key="loading" className="h-8 w-12" />
+            ) : stats.lastPrice ? (
+              <span key="price">${stats.lastPrice.toFormat(2)}</span>
+            ) : (
+              <span key="empty">-</span>
+            )}
+          </div>
+          <div
+            className={cn(
+              "text-muted-foreground font-semibold",
+              !stats.pctChange || stats.pctChange.eq(0)
+                ? "text-muted-foreground"
+                : stats.pctChange.gt(0)
+                  ? "text-success"
+                  : "text-error"
+            )}
+          >
+            {stats.pctChange?.gt(0) ? "+" : ""}
+            {stats.pctChange?.toFixed(2)}%
+          </div>
         </div>
       </div>
       <div>
         <div className="text-muted-foreground font-semibold">Total Vol</div>
         <div className="text-base">
-          {isTotalVolumeLoading ? (
+          {stats.isLoadingVolume ? (
             <Skeleton key="loading" className="h-6 w-12" />
-          ) : totalVolume ? (
-            <span key="volume">${totalVolume.toFormat(2)}</span>
+          ) : stats.totalVolume ? (
+            <span key="volume">${stats.totalVolume.toFormat(2)}</span>
           ) : (
             <span key="empty">-</span>
           )}

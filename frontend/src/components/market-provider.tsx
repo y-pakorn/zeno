@@ -11,6 +11,7 @@ import { useCollateralPrices } from "@/hooks/use-collateral-prices"
 import { MyOrders, useMyOrders } from "@/hooks/use-my-orders"
 import { useOnchainMarket } from "@/hooks/use-onchain-market"
 import { useOpenOrders } from "@/hooks/use-open-orders"
+import { useFilledOrderEvents } from "@/hooks/use-order-events"
 import { useNetwork } from "@/components/wallet-provider"
 
 export type MarketProviderContextType = {
@@ -18,6 +19,14 @@ export type MarketProviderContextType = {
   onchainMarket: UseQueryResult<OnchainMarket>
   collateralPrices: UseQueryResult<Record<string, BigNumber>>
   myOrders: MyOrders
+  stats: {
+    lastPrice: BigNumber | null
+    isLoadingLastPrice: boolean
+    pctChange: BigNumber | null
+    isLoadingPctChange: boolean
+    totalVolume: BigNumber
+    isLoadingVolume: boolean
+  }
 }
 
 const MarketProviderContext = createContext<MarketProviderContextType>(
@@ -57,6 +66,46 @@ export const MarketProvider = ({
     market,
   })
 
+  const filledOrders = useFilledOrderEvents({
+    market,
+  })
+
+  const stats = useMemo(() => {
+    const lastFilledOrder = filledOrders.data?.[0]
+    const firstFilledOrder = filledOrders.data?.[filledOrders.data.length - 1]
+    const lastPrice = lastFilledOrder
+      ? lastFilledOrder.rate.multipliedBy(
+          collateralPrices.data?.[lastFilledOrder.collateral.coinType] || 0
+        )
+      : null
+    const firstPrice = firstFilledOrder
+      ? firstFilledOrder.rate.multipliedBy(
+          collateralPrices.data?.[firstFilledOrder.collateral.coinType] || 0
+        )
+      : null
+    const totalVolume = _.chain(onchainMarket.data?.collateral)
+      .entries()
+      .reduce(
+        (acc, [coinType, collateral]) =>
+          acc.plus(
+            collateral.volumeFilled.multipliedBy(
+              collateralPrices.data?.[coinType] || 0
+            )
+          ),
+        new BigNumber(0)
+      )
+      .value()
+
+    return {
+      lastPrice,
+      isLoadingLastPrice: filledOrders.isPending || collateralPrices.isPending,
+      pctChange: lastPrice?.div(firstPrice || 1).minus(1) || null,
+      isLoadingPctChange: filledOrders.isPending || collateralPrices.isPending,
+      totalVolume,
+      isLoadingVolume: onchainMarket.isPending || collateralPrices.isPending,
+    }
+  }, [filledOrders.data, collateralPrices.data, onchainMarket.data])
+
   return (
     <MarketProviderContext.Provider
       value={{
@@ -64,6 +113,7 @@ export const MarketProvider = ({
         onchainMarket,
         collateralPrices,
         myOrders,
+        stats,
       }}
     >
       {children}

@@ -7,12 +7,17 @@ import {
   useAccounts,
   useCurrentAccount,
   useDisconnectWallet,
+  useSuiClient,
+  useSuiClientContext,
   useSwitchAccount,
 } from "@mysten/dapp-kit"
+import { requestSuiFromFaucetV0 } from "@mysten/sui/faucet"
 import type { WalletAccount } from "@mysten/wallet-standard"
+import { useMutation } from "@tanstack/react-query"
 import {
   ChevronDown,
   Copy,
+  Droplets,
   ExternalLink,
   Loader2,
   LogOut,
@@ -62,6 +67,22 @@ function ConnectedWalletButtonContent({
   const { mutateAsync: disconnect } = useDisconnectWallet()
   const { mutateAsync: switchAccount } = useSwitchAccount()
   const { networkConfig } = useNetwork()
+
+  const { mutateAsync: requestFaucet, isPending: isRequestingFaucet } =
+    useMutation({
+      mutationFn: async () => {
+        await requestSuiFromFaucetV0({
+          host: networkConfig.faucet,
+          recipient: currentAccount.address,
+        })
+      },
+      onSuccess: () => {
+        toast.success("Faucet request successful")
+      },
+      onError: () => {
+        toast.error("Faucet request failed")
+      },
+    })
 
   return (
     <DropdownMenu>
@@ -131,6 +152,25 @@ function ConnectedWalletButtonContent({
             Portfolio
           </DropdownMenuItem>
         </Link>
+        {"faucet" in networkConfig && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              disabled={isRequestingFaucet}
+              onClick={async (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                requestFaucet()
+              }}
+            >
+              <Droplets />
+              Request Faucet
+              {isRequestingFaucet && (
+                <Loader2 className="ml-auto animate-spin" />
+              )}
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={() => disconnect()}>
           <LogOut />

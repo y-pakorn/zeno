@@ -3,6 +3,7 @@
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit"
 import BigNumber from "bignumber.js"
 import _ from "lodash"
+import { Loader2 } from "lucide-react"
 import { match, P } from "ts-pattern"
 
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +30,7 @@ export function TakerOrder() {
       coinType: selected?.coinType || "",
     },
     {
+      refetchInterval: 20 * 1000, // 20 seconds
       enabled: !!address?.address && !!selected?.coinType,
     }
   )
@@ -128,7 +130,22 @@ export function TakerOrder() {
                         balance.refetch()
                         unselectAllOrders()
                       },
-                      children: selected.type === "buy" ? "Sell" : "Buy",
+                      children:
+                        selected.type === "buy" ? (
+                          fillOrder.isPending ? (
+                            <>
+                              Buying... <Loader2 className="animate-spin" />
+                            </>
+                          ) : (
+                            "Buy"
+                          )
+                        ) : fillOrder.isPending ? (
+                          <>
+                            Selling... <Loader2 className="animate-spin" />
+                          </>
+                        ) : (
+                          "Sell"
+                        ),
                     })}
       />
       {selected && (

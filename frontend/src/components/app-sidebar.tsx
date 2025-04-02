@@ -43,6 +43,7 @@ const items = [
         icon: KanbanSquare,
         href: "/markets",
         className: "-rotate-90",
+        disabled: true,
         // matchFn: (pathname) => pathname.startsWith("/pre-market"),
       },
     ],

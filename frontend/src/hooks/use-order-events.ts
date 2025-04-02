@@ -30,6 +30,7 @@ export function useOpenOrderEvents({
           MoveEventType: `${market.packageId}::zeno::OrderCreated`,
         },
         order: "descending",
+        limit: 1000,
       })
       return events.data.map((event) => ({
         ...parseOpenOrderEvent(event, market),
@@ -58,6 +59,7 @@ export function useFilledOrderEvents({
           MoveEventType: `${market.packageId}::zeno::OrderFilled`,
         },
         order: "descending",
+        limit: 1000,
       })
       return events.data.map((event) => ({
         ...parseFilledOrderEvent(event, market),
@@ -86,6 +88,7 @@ export function useCancelledOrderEvents({
           MoveEventType: `${market.packageId}::zeno::OrderCancelled`,
         },
         order: "descending",
+        limit: 1000,
       })
       return events.data
         .map((event) => ({
