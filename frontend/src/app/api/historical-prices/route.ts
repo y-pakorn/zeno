@@ -91,8 +91,9 @@ export async function GET(request: NextRequest) {
   }
 
   // Convert to final format efficiently
-  const result: { [key: string]: [number, number, number, number, number][] } =
-    {}
+  const result: {
+    [key: string]: [number, number, number, number, number, number][]
+  } = {}
 
   for (const [coinType, periodMap] of priceMap.entries()) {
     const periods = Array.from(periodMap.entries()).sort(([a], [b]) => b - a) // Sort by period in descending order
@@ -103,6 +104,7 @@ export async function GET(request: NextRequest) {
       data.minPrice,
       data.maxPrice,
       data.volume,
+      data.count,
     ])
   }
 

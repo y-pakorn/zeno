@@ -2,9 +2,8 @@
 
 import { useMemo } from "react"
 
-import { PreMarket, UpcomingMarket } from "@/types/market"
+import { UpcomingMarket } from "@/types/market"
 import { markets } from "@/config/market"
-import { MarketProvider } from "@/components/market-provider"
 import { useNetwork } from "@/components/wallet-provider"
 
 export function UpcomingMarkets() {

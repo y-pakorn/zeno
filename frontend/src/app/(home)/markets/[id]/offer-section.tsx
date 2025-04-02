@@ -5,24 +5,28 @@ import { useCurrentAccount } from "@mysten/dapp-kit"
 import { ColumnDef } from "@tanstack/react-table"
 import BigNumber from "bignumber.js"
 import _ from "lodash"
-import { ChevronDown, CircleX } from "lucide-react"
+import { ChartBar, ChevronDown, CircleX } from "lucide-react"
 
 import { Collateral } from "@/types/market"
 import { Offer } from "@/types/order"
 import { cn, formatBigNumber } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Toggle } from "@/components/ui/toggle"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useBook } from "@/components/book-provider"
 import { DataTable } from "@/components/data-table"
 import { EmptyState } from "@/components/empty-state"
 import { useMarket } from "@/components/market-provider"
 import { useOrder } from "@/components/order-provider"
+
+import { PriceChart } from "./price-chart"
 
 type Filter = {
   type: "buy" | "sell" | "all"
@@ -50,6 +54,7 @@ export function OfferSection({
 }: React.ComponentProps<"div">) {
   const { market } = useMarket()
 
+  const [showChart, setShowChart] = useState(true)
   const [filters, setFilters] = useState<Filter>({
     type: "all",
     collateral: undefined,
@@ -67,6 +72,11 @@ export function OfferSection({
       )}
       {...props}
     >
+      <Collapsible open={showChart} onOpenChange={setShowChart}>
+        <CollapsibleContent>
+          <PriceChart />
+        </CollapsibleContent>
+      </Collapsible>
       {market.resolution && new Date() > market.resolution.settlementStart && (
         <EmptyState
           icon={CircleX}
@@ -82,7 +92,7 @@ export function OfferSection({
         />
       )}
       <h2 className="font-heading text-2xl font-bold">Offers</h2>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <ToggleGroup
           variant="outline"
           type="single"
@@ -162,6 +172,13 @@ export function OfferSection({
             ))}
           </DropdownMenuContent>
         </DropdownMenu> */}
+        <Toggle
+          variant="brand"
+          pressed={showChart}
+          onPressedChange={setShowChart}
+        >
+          <ChartBar />
+        </Toggle>
       </div>
       <OfferTable filters={filters} />
     </div>
