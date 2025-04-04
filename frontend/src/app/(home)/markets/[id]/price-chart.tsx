@@ -15,6 +15,7 @@ import {
 import { HistoricalPrice, HistoricalPrices } from "@/types/price"
 import { usePrices } from "@/hooks/use-prices"
 import {
+  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -22,17 +23,30 @@ import {
 import { useMarket } from "@/components/market-provider"
 
 const chartConfig = {
+  period: {
+    label: "Period",
+    color: "hsl(var(--quaternary))",
+  },
   price: {
     label: "Price",
     color: "hsl(var(--brand))",
   },
   volume: {
     label: "Volume",
-    color: "hsl(var(--primary))",
+    color: "hsl(var(--foreground))",
   },
   count: {
     label: "Count",
     color: "hsl(var(--secondary))",
+  },
+} satisfies ChartConfig
+
+const additionalFormatter = {
+  price: {
+    prefix: "$",
+  },
+  volume: {
+    prefix: "$",
   },
 }
 
@@ -100,9 +114,9 @@ export function PriceChart() {
     <div className="bg-secondary h-[200px] w-full rounded-2xl p-4">
       <div className="text-quaternary flex h-6 items-center gap-2 text-sm font-semibold">
         <h3>Price</h3>
-        <div>15m</div>
+        <div className="underline">15m</div>
         <p className="text-secondary-foreground ml-auto">
-          {dayjs(prices.data?.timestamp).format("MMM D, HH:mm")}
+          Updated at {dayjs(prices.data?.timestamp).format("MMM D, HH:mm")}
         </p>
       </div>
       <ChartContainer
@@ -125,7 +139,34 @@ export function PriceChart() {
             tickMargin={8}
             tickFormatter={(value) => dayjs(value).format("MMM D, HH:mm")}
           />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            yAxisId="price"
+            hide={true}
+          />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            yAxisId="volume"
+            hide={true}
+            domain={["auto", (m: number) => 3 * m]}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={
+              <ChartTooltipContent
+                labelKey="period"
+                additionalFormatter={additionalFormatter}
+                labelFormatter={(_, payload) => {
+                  const date = payload?.[0].payload?.period
+                  return dayjs(date).format("MMM D, HH:mm")
+                }}
+              />
+            }
+          />
           <defs>
             <linearGradient id="fillPrice" x1="0" y1="0" x2="0" y2="1">
               <stop
@@ -139,6 +180,18 @@ export function PriceChart() {
                 stopOpacity={0.0}
               />
             </linearGradient>
+            <linearGradient id="fillVolume" x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="10%"
+                stopColor="var(--color-volume)"
+                stopOpacity={0.5}
+              />
+              <stop
+                offset="90%"
+                stopColor="var(--color-volume)"
+                stopOpacity={0.0}
+              />
+            </linearGradient>
           </defs>
           <Area
             dataKey="price"
@@ -147,6 +200,15 @@ export function PriceChart() {
             fillOpacity={0.4}
             stroke="var(--color-price)"
             stackId="a"
+            yAxisId="price"
+          />
+          <Area
+            dataKey="volume"
+            type="natural"
+            fill="url(#fillVolume)"
+            stroke="var(--color-volume)"
+            fillOpacity={0.4}
+            yAxisId="volume"
           />
         </AreaChart>
       </ChartContainer>
