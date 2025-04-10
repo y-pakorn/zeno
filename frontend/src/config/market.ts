@@ -89,13 +89,13 @@ export const markets: Market[] = [
     featured: true,
     totalSupply: 1_000_000_000, // 1 billion
     packageId:
-      "0x5571cd3150cc11b365bc53fd90ec4be90f5149eb263447f2b60537cbc75a0ccf",
+      "0x400d80c9c0fdbf010391133f80115566260cf5ef75e4602716621a103e5d766b",
     adminCap:
-      "0x46fabcddfdf96bd0f486bc0eadf5ecad93be2c42161617f449c6d583cbc51804",
-    marketId:
-      "0xf3b6045d29cb70275bf346ee24ab2494fe49eea4754b3e3c36573e1b491bf7ea",
+      "0xef1442e279c087c5c68032f021806d6cfa64bb7e6c3db9bd307405d509121327",
     upgradeCap:
-      "0xb41384c3eacdc9ada2afaa741b2c1519a7a0e99628ea85e5a40b6c7482deae3c",
+      "0x8bb744c63677f4d1f72712a66b935fe5bc27d56242cb746e932731cd0041eab0",
+    marketId:
+      "0xdffe3a6ac4b9b4f6fcdf1bfa37a4be6b5852e6fba19b1420699c397851e5fce8",
     network: "testnet",
     name: "Haedal",
     ticker: "HAE",
@@ -118,7 +118,7 @@ export const markets: Market[] = [
       },
       {
         coinType:
-          "0xf24164f150d742384b1e4141daabba56139ba7156a47a629e75e1c776470c640::coin::COIN",
+          "0x505415ff7eb44e4ce5c508d30d7029ecfefbc308cefdb24587f9aa0c805e26a2::coin::COIN",
         ticker: "USDC",
         icon: "https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/vectors/usdc-fpxuadmgafrjjy85bgie5.png/usdc-kksfxcrdl3f9pjx0v6jxxp.png?_a=DAJFJtWIZAAC",
         minimumAmount: 10, // 10 usdc
@@ -148,14 +148,14 @@ export const markets: Market[] = [
       twitter: "https://x.com/ikadotxyz",
     },
     totalSupply: 1_000_000_000, // 1 billion
-    marketId:
-      "0xb03ea3893adabf9124b0df57bb0fc2b4633d384ef436ea42a2906d87ac0e7c5f",
     packageId:
-      "0x18c6b054c60a909e01f37aeeb2c414924594f09ffb4c948fe57b70902fcaaa91",
+      "0x86f6fc72f8b725e394a0bbc359b076396529e4c077435bfec081822fd8227bb6",
     adminCap:
-      "0x1c7eec519b10f54f3fa8297f8049dc20f0122cfa8a5b47ef129f75ab21a807ca",
+      "0xd80f870ee45ec1b4b6523629c566fce27a8782666498939e4f4eb5d02118431d",
     upgradeCap:
-      "0xb0cf8d324928ccbb8e14bef98fb97a63274fc4e670c82431b57485ac77038526",
+      "0x9b13835a654e3da8a260c06dcbb1569e502228e1dd493cec673061c1bc7ca800",
+    marketId:
+      "0xad69e4cf2bf72d96c5b910db7c90317a346d792d29455a2ebd90584a189890e3",
     collaterals: [
       {
         coinType: "0x2::sui::SUI",
@@ -168,7 +168,7 @@ export const markets: Market[] = [
       },
       {
         coinType:
-          "0xf24164f150d742384b1e4141daabba56139ba7156a47a629e75e1c776470c640::coin::COIN",
+          "0x505415ff7eb44e4ce5c508d30d7029ecfefbc308cefdb24587f9aa0c805e26a2::coin::COIN",
         ticker: "USDC",
         icon: "https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/vectors/usdc-fpxuadmgafrjjy85bgie5.png/usdc-kksfxcrdl3f9pjx0v6jxxp.png?_a=DAJFJtWIZAAC",
         minimumAmount: 10, // 10 usdc

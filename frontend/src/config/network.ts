@@ -19,8 +19,8 @@ export const networkConfig = {
     faucetToken: {
       ticker: "USDC",
       module:
-        "0xf24164f150d742384b1e4141daabba56139ba7156a47a629e75e1c776470c640::coin",
-      cap: "0x29d38e4e17cefe62209c6a3e6a5dc5194ce2cd3a5379bee97f24a700efbce586",
+        "0x505415ff7eb44e4ce5c508d30d7029ecfefbc308cefdb24587f9aa0c805e26a2::coin",
+      cap: "0x1b50166d39cf291f042bd0603067f8b9d2c40c788467240e205f92090d2b7900",
       exponent: 6,
     },
   },
