@@ -5,7 +5,7 @@ import { configDotenv } from "dotenv";
 
 configDotenv();
 
-export const selectedNetwork = "devnet";
+export const selectedNetwork = "testnet";
 
 export const network = getFullnodeUrl(selectedNetwork);
 export const client = new SuiClient({ url: network });

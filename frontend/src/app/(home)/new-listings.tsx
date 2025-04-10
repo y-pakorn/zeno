@@ -32,7 +32,7 @@ export function NewListings() {
       <h2 className="font-heading text-2xl font-bold">Featured</h2>
       <div className="flex w-full gap-4 overflow-x-auto">
         {availableMarkets.map((item) => (
-          <MarketProvider key={item.id} market={item}>
+          <MarketProvider key={item.id} market={item} queryMyOrders={false}>
             <NewListingCard {...item} />
           </MarketProvider>
         ))}
@@ -70,7 +70,7 @@ function NewListingCard(market: Market) {
           </div>
           <div className="flex items-center justify-between">
             {stats.isLoadingPctChange ? (
-              <Skeleton className="h-6 w-12" />
+              <Skeleton className="h-5 w-12" />
             ) : (
               <div
                 className={cn(
@@ -86,7 +86,7 @@ function NewListingCard(market: Market) {
               </div>
             )}
             {stats.isLoadingLastPrice ? (
-              <Skeleton className="h-6 w-12" />
+              <Skeleton className="h-5 w-12" />
             ) : (
               <div className="text-sm font-bold">
                 {stats.lastPrice ? `$${stats.lastPrice.toFormat(2)}` : "-"}
@@ -96,9 +96,13 @@ function NewListingCard(market: Market) {
           <Separator className="my-2" />
           <div className="flex items-center justify-between text-sm font-medium">
             <div className="text-muted-foreground">Total Volume</div>
-            <div className="text-sm">
-              {stats.totalVolume ? `$${stats.totalVolume.toFormat(2)}` : "-"}
-            </div>
+            {stats.isLoadingVolume ? (
+              <Skeleton className="h-4 w-16" />
+            ) : (
+              <div className="text-sm">
+                {stats.totalVolume ? `$${stats.totalVolume.toFormat(2)}` : "-"}
+              </div>
+            )}
           </div>
         </div>
       </div>

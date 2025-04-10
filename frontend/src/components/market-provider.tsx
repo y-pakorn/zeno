@@ -99,7 +99,11 @@ export const MarketProvider = ({
     return {
       lastPrice,
       isLoadingLastPrice: filledOrders.isPending || collateralPrices.isPending,
-      pctChange: lastPrice?.div(firstPrice || 1).minus(1) || null,
+      pctChange:
+        lastPrice
+          ?.div(firstPrice || 1)
+          .minus(1)
+          .multipliedBy(100) || null,
       isLoadingPctChange: filledOrders.isPending || collateralPrices.isPending,
       totalVolume,
       isLoadingVolume: onchainMarket.isPending || collateralPrices.isPending,

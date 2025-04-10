@@ -12,8 +12,9 @@ import {
   useSwitchAccount,
 } from "@mysten/dapp-kit"
 import { requestSuiFromFaucetV0 } from "@mysten/sui/faucet"
+import { Transaction } from "@mysten/sui/transactions"
 import type { WalletAccount } from "@mysten/wallet-standard"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   ChevronDown,
   Copy,
@@ -26,6 +27,8 @@ import {
 import { toast } from "sonner"
 
 import { cn, formatAddress } from "@/lib/utils"
+import { useSignAndExecute } from "@/hooks/use-sign-and-execute"
+import { triggerUpdateTokenBalance } from "@/hooks/use-token-balance"
 
 import { Button } from "./ui/button"
 import {
@@ -67,22 +70,6 @@ function ConnectedWalletButtonContent({
   const { mutateAsync: disconnect } = useDisconnectWallet()
   const { mutateAsync: switchAccount } = useSwitchAccount()
   const { networkConfig } = useNetwork()
-
-  const { mutateAsync: requestFaucet, isPending: isRequestingFaucet } =
-    useMutation({
-      mutationFn: async () => {
-        await requestSuiFromFaucetV0({
-          host: networkConfig.faucet,
-          recipient: currentAccount.address,
-        })
-      },
-      onSuccess: () => {
-        toast.success("Faucet request successful")
-      },
-      onError: () => {
-        toast.error("Faucet request failed")
-      },
-    })
 
   return (
     <DropdownMenu>
@@ -155,20 +142,19 @@ function ConnectedWalletButtonContent({
         {"faucet" in networkConfig && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              disabled={isRequestingFaucet}
-              onClick={async (e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                requestFaucet()
-              }}
-            >
-              <Droplets />
-              Request Faucet
-              {isRequestingFaucet && (
-                <Loader2 className="ml-auto animate-spin" />
-              )}
-            </DropdownMenuItem>
+            <NativeFaucetButton
+              address={currentAccount.address}
+              faucet={networkConfig.faucet as string}
+            />
+          </>
+        )}
+        {"faucetToken" in networkConfig && (
+          <>
+            <DropdownMenuSeparator />
+            <TokenFaucetButton
+              address={currentAccount.address}
+              faucet={networkConfig.faucetToken as any}
+            />
           </>
         )}
         <DropdownMenuSeparator />
@@ -178,6 +164,95 @@ function ConnectedWalletButtonContent({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+function NativeFaucetButton({
+  address,
+  faucet,
+}: {
+  address: string
+  faucet: string
+}) {
+  const { mutateAsync: requestFaucet, isPending: isRequestingFaucet } =
+    useMutation({
+      mutationFn: async () => {
+        await requestSuiFromFaucetV0({
+          host: faucet,
+          recipient: address,
+        })
+      },
+      onSuccess: () => {
+        toast.success("Faucet request successful")
+      },
+      onError: () => {
+        toast.error("Faucet request failed")
+      },
+    })
+  return (
+    <DropdownMenuItem
+      disabled={isRequestingFaucet}
+      onClick={async (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        requestFaucet()
+      }}
+    >
+      <Droplets />
+      Request Faucet
+      {isRequestingFaucet && <Loader2 className="ml-auto animate-spin" />}
+    </DropdownMenuItem>
+  )
+}
+
+function TokenFaucetButton({
+  address,
+  faucet,
+}: {
+  address: string
+  faucet: {
+    ticker: string
+    module: string
+    cap: string
+    exponent: number
+  }
+}) {
+  const signAndExecute = useSignAndExecute()
+  const queryClient = useQueryClient()
+  const { mutateAsync: requestFaucet, isPending: isRequestingFaucet } =
+    useMutation({
+      mutationFn: async () => {
+        const txb = new Transaction()
+        txb.moveCall({
+          target: `${faucet.module}::mint`,
+          arguments: [
+            txb.object(faucet.cap),
+            txb.pure.u64(1000 * 10 ** faucet.exponent),
+            txb.pure.id(address),
+          ],
+        })
+
+        const tx = await signAndExecute.mutateAsync({
+          transaction: txb,
+        })
+        triggerUpdateTokenBalance(queryClient, faucet.ticker, address)
+        toast.success("Faucet request successful")
+      },
+    })
+
+  return (
+    <DropdownMenuItem
+      disabled={isRequestingFaucet}
+      onClick={async (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        requestFaucet()
+      }}
+    >
+      <Droplets />
+      Request {faucet.ticker} Faucet
+      {isRequestingFaucet && <Loader2 className="ml-auto animate-spin" />}
+    </DropdownMenuItem>
   )
 }
 

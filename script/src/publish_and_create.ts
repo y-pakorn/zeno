@@ -4,11 +4,16 @@ import path from "node:path";
 import { execSync } from "node:child_process";
 
 (async () => {
-  const marketName = "Ika";
+  const marketName = "Haedal";
   const collaterals = [
     {
       type: "0x2::sui::SUI",
       min: 1_000_000_000, // 1 SUI
+    },
+    {
+      // testnet only usdc
+      type: "0xf24164f150d742384b1e4141daabba56139ba7156a47a629e75e1c776470c640::coin::COIN",
+      min: 1_000_000, // 10 COIN (6 decimals)
     },
   ];
   const fees = [150, 150, 50, 150]; // 1.5%, 1.5%, 0.5%, 1.5%

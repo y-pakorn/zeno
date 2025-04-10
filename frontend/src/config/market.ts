@@ -55,7 +55,7 @@ export const markets: Market[] = [
     icon: "https://strapi-dev.scand.app/uploads/Momentum_logo_2f4bd6f8e9.jpg",
     name: "Momentum",
     ticker: "MMT",
-    network: "devnet",
+    network: "testnet",
     links: {
       twitter: "https://x.com/MMTFinance",
     },
@@ -66,7 +66,7 @@ export const markets: Market[] = [
     icon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFcAAABgCAMAAABfaR5LAAAAAXNSR0IArs4c6QAAACdQTFRFR3BM////////////////////////////////////////////////DaKZigAAAAx0Uk5TABAlQFp7m6+/z9/vYCk7bgAAAhhJREFUeNrVllGO6jAQBHvs2Intuf953w/SW9xZWnjHK7Y+UShCBbnBMlZGNwhWrO5+bLG65y1WH9HWB1e09UFBEKkO/0KKsvoTPUg7/JkTIRw+cSCE0yeC8g7fk9cnKkIom/Jev5S3IYT81/MaIjCfuD47b/WJvCkvPjMvn5E8QVbqTAKAlF+RVF5rTlx0UBHDALT5RdKyt/prMvijz9fanuhemNsJEto5g/hKdEam5kxL/KiZAqB/M0GpO9MMWMxblZbuhRi3eZVW5z1vF15oF/M2rcUpvOk+7732NJ7De/rtBJGWz+S2kNe0Ful4pvKTH9Rca5k+581ODKllOufVaG2iq68ILQ7K664pUJwqr9bqvI3yCm1o3gJNmfNagJbyGpBDtBg0QSHaTHmbXr+382bAYjJcc97DFWUxb4Q40xuaR4iL/gPVV8SXXvi0InaZ12BNizmvXvgFcdELDyFezJuxIDa98MCCONME9e9OAzvfEFeZt4Av1uJLLnyGEOu8FZx3AAviQ/6BOrEirnLhD6yIm8ybMFG0GCYXvgMsZqrKK94gxMt5tZjzNpFXNX4nbwO0mC/t062ZzvugtD7xVCz/x6DyrsMThBAanZEBqLzr8ARtyouPzssTtClv2pO3I4Y+1U078o4CbMjbE0KYFr4agPC8PYMIyHsaAin0wELztoRYBp2MIWR6YDEc9OuKwfr46Uj+A/+tmr+xsprpAAAAAElFTkSuQmCC",
     name: "7K",
     ticker: "7K",
-    network: "devnet",
+    network: "testnet",
     links: {
       twitter: "https://x.com/7k_ag_",
       website: "https://7k.ag/",
@@ -78,25 +78,25 @@ export const markets: Market[] = [
     icon: "https://strapi-dev.scand.app/uploads/Magma_Finance_logo_7cd45acadb.jpg",
     name: "Magma Finance",
     ticker: "MAGMA",
-    network: "devnet",
+    network: "testnet",
     links: {
       twitter: "https://x.com/Magma_Finance",
       website: "https://magmafinance.io/",
     },
   },
   {
-    id: "haedal-devnet",
+    id: "haedal-testnet",
     featured: true,
     totalSupply: 1_000_000_000, // 1 billion
     packageId:
-      "0xa1612ce0e2e94a8bbe40d3feeead4d6299a17472d112fe693cb89e203e0064de",
+      "0x5571cd3150cc11b365bc53fd90ec4be90f5149eb263447f2b60537cbc75a0ccf",
     adminCap:
-      "0xb440686fff3fbf717f80979e02ee87774ffb570c334ca5466f697133d3896690",
+      "0x46fabcddfdf96bd0f486bc0eadf5ecad93be2c42161617f449c6d583cbc51804",
     marketId:
-      "0xd74e6b03c7178faca0855a9c90f6e393c04808f649b7550c83f14dfa7f1aa78f",
+      "0xf3b6045d29cb70275bf346ee24ab2494fe49eea4754b3e3c36573e1b491bf7ea",
     upgradeCap:
-      "0xb755fbfbe2742b49dddbd09da10a65b7d57704ac499026e1fc12290875f7d095",
-    network: "devnet",
+      "0xb41384c3eacdc9ada2afaa741b2c1519a7a0e99628ea85e5a40b6c7482deae3c",
+    network: "testnet",
     name: "Haedal",
     ticker: "HAE",
     icon: "https://img.cryptorank.io/coins/haedal1705486502241.png",
@@ -111,10 +111,20 @@ export const markets: Market[] = [
         coinType: "0x2::sui::SUI",
         ticker: "SUI",
         icon: "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png",
-        minimumAmount: 1, // 5 sui
+        minimumAmount: 1, // 1 sui
         pythId:
           "0x23d7315113f5b1d3ba7a83604c44b94d79f4fd69af77f804fc7f920a6dc65744",
         exponent: 9,
+      },
+      {
+        coinType:
+          "0xf24164f150d742384b1e4141daabba56139ba7156a47a629e75e1c776470c640::coin::COIN",
+        ticker: "USDC",
+        icon: "https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/vectors/usdc-fpxuadmgafrjjy85bgie5.png/usdc-kksfxcrdl3f9pjx0v6jxxp.png?_a=DAJFJtWIZAAC",
+        minimumAmount: 10, // 10 usdc
+        pythId:
+          "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+        exponent: 6, // testnet usdc has 6 decimals
       },
     ],
     fee: {
@@ -125,9 +135,9 @@ export const markets: Market[] = [
     },
   },
   {
-    id: "ika-devnet",
+    id: "ika-testnet",
     featured: true,
-    network: "devnet",
+    network: "testnet",
     name: "Ika",
     ticker: "IKA",
     icon: "https://public.rootdata.com/images/b6/1730353656504.png",
@@ -139,22 +149,32 @@ export const markets: Market[] = [
     },
     totalSupply: 1_000_000_000, // 1 billion
     marketId:
-      "0x45d755df4e1a908a89386b3885de0b3fe9952bb3d857a5f40b3cecbe795a35e8",
+      "0xb03ea3893adabf9124b0df57bb0fc2b4633d384ef436ea42a2906d87ac0e7c5f",
     packageId:
-      "0x527b646c46055c8749af810b38d813f1fdc6d5378eb3e1b732f094e325af0ef3",
+      "0x18c6b054c60a909e01f37aeeb2c414924594f09ffb4c948fe57b70902fcaaa91",
     adminCap:
-      "0xbbae3fbd8af937ea2d8eb14bb07e5d9a3af77858b9f2ee2ac9f554f0a5445b06",
+      "0x1c7eec519b10f54f3fa8297f8049dc20f0122cfa8a5b47ef129f75ab21a807ca",
     upgradeCap:
-      "0x4e1ae5cafc7afb8d30b826a58e13436110e2363655b83ba0b84416f5d4e41c85",
+      "0xb0cf8d324928ccbb8e14bef98fb97a63274fc4e670c82431b57485ac77038526",
     collaterals: [
       {
         coinType: "0x2::sui::SUI",
         ticker: "SUI",
         icon: "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png",
-        minimumAmount: 1, // 5 sui
+        minimumAmount: 1, // 1 sui
         pythId:
           "0x23d7315113f5b1d3ba7a83604c44b94d79f4fd69af77f804fc7f920a6dc65744",
         exponent: 9,
+      },
+      {
+        coinType:
+          "0xf24164f150d742384b1e4141daabba56139ba7156a47a629e75e1c776470c640::coin::COIN",
+        ticker: "USDC",
+        icon: "https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/vectors/usdc-fpxuadmgafrjjy85bgie5.png/usdc-kksfxcrdl3f9pjx0v6jxxp.png?_a=DAJFJtWIZAAC",
+        minimumAmount: 10, // 10 usdc
+        pythId:
+          "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+        exponent: 6, // testnet usdc has 6 decimals
       },
     ],
     fee: {

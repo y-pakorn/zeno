@@ -11,6 +11,7 @@ import { useCancelOrder } from "@/hooks/use-cancel-order"
 import { useClaimOrder } from "@/hooks/use-claim-order"
 import { useCloseOrder } from "@/hooks/use-close-order"
 import { useSettleOrder } from "@/hooks/use-settle-order"
+import { useTokenBalance } from "@/hooks/use-token-balance"
 import { useMarket } from "@/components/market-provider"
 
 import { Badge } from "./ui/badge"
@@ -274,18 +275,10 @@ export const FilledOrderButton = memo(function FilledOrderButton({
       (account!.address === order.taker && order.type === "buy"),
     [account, order]
   )
-
-  const balance = useSuiClientQuery(
-    "getBalance",
-    {
-      owner: account?.address || "",
-      coinType: market.resolution?.finalCoinType || "",
-    },
-    {
-      enabled:
-        !!market.resolution?.finalCoinType && !!account?.address && isSeller,
-    }
-  )
+  const balance = useTokenBalance({
+    coinType: market.resolution?.finalCoinType || "",
+    enabled: !!market.resolution?.finalCoinType && isSeller,
+  })
 
   if (!market.resolution)
     return (

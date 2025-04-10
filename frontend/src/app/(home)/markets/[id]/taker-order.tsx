@@ -6,6 +6,7 @@ import _ from "lodash"
 import { Loader2 } from "lucide-react"
 import { match, P } from "ts-pattern"
 
+import { useTokenBalance } from "@/hooks/use-token-balance"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -23,17 +24,11 @@ export function TakerOrder() {
   const { selectedOrderIds, unselectAllOrders, selected, fillOrder } =
     useOrder()
   const address = useCurrentAccount()
-  const balance = useSuiClientQuery(
-    "getBalance",
-    {
-      owner: address?.address || "",
-      coinType: selected?.coinType || "",
-    },
-    {
-      refetchInterval: 20 * 1000, // 20 seconds
-      enabled: !!address?.address && !!selected?.coinType,
-    }
-  )
+  const balance = useTokenBalance({
+    coinType: selected?.coinType || "",
+    refetchInterval: 20 * 1000, // 20 seconds
+    enabled: !!selected?.coinType,
+  })
 
   return (
     <>

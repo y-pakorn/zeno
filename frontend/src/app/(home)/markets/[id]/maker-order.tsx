@@ -9,6 +9,7 @@ import { z } from "zod"
 
 import { cn } from "@/lib/utils"
 import { useCreateOrder } from "@/hooks/use-create-order"
+import { useTokenBalance } from "@/hooks/use-token-balance"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -135,17 +136,11 @@ export function MakerOrder() {
   )
 
   const address = useCurrentAccount()
-  const balance = useSuiClientQuery(
-    "getBalance",
-    {
-      owner: address?.address || "",
-      coinType: collateralCoinType,
-    },
-    {
-      refetchInterval: 20 * 1000, // 20 seconds
-      enabled: !!address && !!collateralCoinType,
-    }
-  )
+  const balance = useTokenBalance({
+    coinType: collateralCoinType || "",
+    refetchInterval: 20 * 1000, // 20 seconds
+    enabled: !!collateralCoinType,
+  })
 
   const collateral = useMemo(() => {
     return market.collaterals.find((c) => c.coinType === collateralCoinType)

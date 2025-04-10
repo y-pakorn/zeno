@@ -65,8 +65,7 @@ export function MarketHeader() {
                   : "text-error"
             )}
           >
-            {stats.pctChange?.gt(0) ? "+" : ""}
-            {stats.pctChange?.toFixed(2)}%
+            {stats.pctChange ? `${stats.pctChange.toFixed(2)}%` : "-"}
           </div>
         </div>
       </div>
