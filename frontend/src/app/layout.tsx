@@ -99,7 +99,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          "bg-background font-heading min-h-screen antialiased",
+          "bg-background font-heading relative min-h-screen antialiased",
           heading.className,
           heading.variable
         )}
@@ -112,7 +112,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <WalletProvider>
             <SidebarProvider>
               <AppSidebar />
-              <main className="relative w-full">
+              <main className="w-full">
                 <div className="container flex min-h-screen flex-col">
                   <AppNavbar />
                   {children}

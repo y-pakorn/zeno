@@ -121,14 +121,16 @@ export function PriceChart() {
       </div>
       <ChartContainer
         config={chartConfig}
-        className="h-[calc(100%-1.5rem)] w-full"
+        className="z-100 h-[calc(100%-2rem)] w-full"
       >
         <AreaChart
           accessibilityLayer
           data={aggregatedPrices}
           margin={{
-            left: 0,
+            top: 4,
             right: 0,
+            bottom: 0,
+            left: 0,
           }}
         >
           <CartesianGrid vertical={false} />
